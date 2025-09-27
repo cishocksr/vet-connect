@@ -1,0 +1,21 @@
+# Node
+node_modules/
+
+# Build artifacts
+dist/
+build/
+
+# Logs & misc
+*.log
+.DS_Store
+
+# Java / Maven
+target/
+
+# IDE
+.idea/
+.vscode/
+
+# Environment files
+.env
+.env.*
