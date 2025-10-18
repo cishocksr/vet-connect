@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-create-resources-table" author="developer">
+        <createTable tableName="resources">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="category_id" type="INTEGER">
+                <constraints nullable="true"
+                             foreignKeyName="fk_resources_category"
+                             references="resource_categories(id)"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="website_url" type="VARCHAR(500)"/>
+            <column name="phone_number" type="VARCHAR(20)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="address_line1" type="VARCHAR(255)"/>
+            <column name="city" type="VARCHAR(100)"/>
+            <column name="state" type="VARCHAR(2)"/>
+            <column name="zip_code" type="VARCHAR(10)"/>
+            <column name="is_national" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="eligibility_criteria" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_resources_category" tableName="resources">
+            <column name="category_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_resources_state" tableName="resources">
+            <column name="state"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

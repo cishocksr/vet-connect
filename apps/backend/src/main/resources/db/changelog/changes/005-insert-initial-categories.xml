@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="005-insert-initial-categories" author="developer">
+        <insert tableName="resource_categories">
+            <column name="name" value="Housing"/>
+            <column name="description" value="Resources for finding shelter and permanent housing"/>
+            <column name="icon_name" value="home"/>
+        </insert>
+
+        <insert tableName="resource_categories">
+            <column name="name" value="Financial"/>
+            <column name="description" value="Financial assistance, benefits, and employment"/>
+            <column name="icon_name" value="dollar-sign"/>
+        </insert>
+
+        <insert tableName="resource_categories">
+            <column name="name" value="Education"/>
+            <column name="description" value="Educational benefits, training, and scholarships"/>
+            <column name="icon_name" value="graduation-cap"/>
+        </insert>
+
+        <insert tableName="resource_categories">
+            <column name="name" value="Mental Health"/>
+            <column name="description" value="Mental health services, counseling, and PTSD support"/>
+            <column name="icon_name" value="brain"/>
+        </insert>
+
+        <insert tableName="resource_categories">
+            <column name="name" value="Healthcare"/>
+            <column name="description" value="Primary care, dental, and general health services"/>
+            <column name="icon_name" value="heart-pulse"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
