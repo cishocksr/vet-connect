@@ -7,7 +7,7 @@ services:
     container_name: vet-connect-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: veteran_connect
+      POSTGRES_DB: vet_connect
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -23,7 +23,7 @@ services:
   # Optional: pgAdmin for database management UI
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: veteran-resource-hub-pgadmin
+    container_name: vet-connect-pgadmin
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com

@@ -6,8 +6,8 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <!-- Include all changelog files in order -->
-    <include file="/db/changelog/changes/001-create-users-table.xml"/>
-    <include file="db/changelog/changes/002-create-resource-categories-table.xml"/>
+    <include file="db/changelog/changes/001-create-users-table.xml"/>
+    <include file="db/changelog/changes/002-create-resources-categories-table.xml"/>
     <include file="db/changelog/changes/003-create-resources-table.xml"/>
     <include file="db/changelog/changes/004-create-saved-resources-table.xml"/>
     <include file="db/changelog/changes/005-insert-initial-categories.xml"/>
