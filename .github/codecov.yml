@@ -1,0 +1,20 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 60%
+        threshold: 5%
+    patch:
+      default:
+        target: 60%
+
+comment:
+  layout: "header, diff, flags, files, footer"
+  behavior: default
+  require_changes: false
+
+ignore:
+  - "apps/backend/src/test/"
+  - "apps/backend/src/main/java/com/vetconnect/VetConnectApplication.java"
+  - "apps/backend/src/main/java/com/vetconnect/config/"
+  - "apps/backend/src/main/java/com/vetconnect/dto/"
