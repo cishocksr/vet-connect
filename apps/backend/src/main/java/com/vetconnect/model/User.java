@@ -31,6 +31,10 @@ public class User {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
+    @NotBlank(message = "Password is required")
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
     @NotBlank(message = "First name is required")
     @Size(max =  100, message = "Last name must be less than 100 characters")
     @Column(name = "first_name", nullable = false, length = 100)
@@ -62,7 +66,7 @@ public class User {
     @Column(name="state", length = 2)
     private String state;
 
-    @Size(min = 10, message = "Zip code must be less than 10 characters")
+    @Size(max = 10, message = "Zip code must be less than 10 characters")
     @Column(name = "zip_code", length = 10)
     private String zipCode;
 
