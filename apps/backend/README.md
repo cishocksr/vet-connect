@@ -2,6 +2,41 @@
 
 <div align="center">
 
+![Build Status](https://github.com/yourusername/vet-connect/workflows/Backend%20CI%2FCD/badge.svg)
+[![codecov](https://codecov.io/gh/yourusername/vet-connect/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/vet-connect)
+[![CodeQL](https://github.com/yourusername/vet-connect/workflows/CodeQL%20Security%20Scan/badge.svg)](https://github.com/yourusername/vet-connect/security/code-scanning)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vetconnect-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=vetconnect-backend)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen.svg)
+![Java](https://img.shields.io/badge/Java-21-blue.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+
+**A RESTful API connecting veterans with essential resources and services**
+
+[Features](#-features) •
+[Quick Start](#-quick-start) •
+[API Documentation](#-api-documentation) •
+[Contributing](#-contributing)
+
+</div>
+```
+
+---
+
+## 🔐 Step 7: Set Up GitHub Secrets
+
+Go to your GitHub repository → Settings → Secrets and Variables → Actions
+
+Add these secrets:
+```
+CODECOV_TOKEN=<your-codecov-token>
+DOCKER_USERNAME=<your-docker-hub-username>
+DOCKER_PASSWORD=<your-docker-hub-password>
+SONAR_TOKEN=<your-sonarcloud-token>
+SLACK_WEBHOOK=<your-slack-webhook-url>
+
+<div align="center">
+
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen.svg)
 ![Java](https://img.shields.io/badge/Java-21-blue.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)
