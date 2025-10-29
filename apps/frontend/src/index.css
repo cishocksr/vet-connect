@@ -1,68 +1,138 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+    --color-background: #ffffff;
+    --color-foreground: #1a1a1a;
+    /* Military Branch Colors */
+    --color-military-army-green: #4a5d23;
+    --color-military-army-gold: #d4af37;
+    --color-military-army-black: #2c2c2c;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+    --color-military-navy-blue: #000080;
+    --color-military-navy-gold: #ffd700;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+    --color-military-air-force-blue: #00308f;
+    --color-military-air-force-silver: #b0c4de;
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+    --color-military-marine-scarlet: #ce1126;
+    --color-military-marine-gold: #d4af37;
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+    --color-military-coast-guard-blue: #00539b;
+    --color-military-coast-guard-orange: #ff6600;
+
+    --color-military-space-force-blue: #1c3f94;
+    --color-military-space-force-silver: #c0c0c0;
+
+    /* Unified military colors */
+    --color-military-green: #4a5d23;
+    --color-military-gold: #d4af37;
+    --color-military-navy: #000080;
+
+    /* Semantic colors */
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #3b82f6;
+
+    /* Animations */
+    --animate-fade-in: fade-in 0.5s ease-in-out;
+    --animate-slide-up: slide-up 0.5s ease-out;
+    --animate-slide-down: slide-down 0.5s ease-out;
+    --animate-scale-in: scale-in 0.3s ease-out;
+
+    /* Font families */
+    --font-sans: Inter, system-ui, sans-serif;
+    --font-display: Inter, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+@keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes slide-up {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-down {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scale-in {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+    }
+
+    * {
+        border-color: hsl(var(--foreground) / 0.1);
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        font-family: Inter, system-ui, -apple-system, sans-serif;
+    }
+}
+
+@layer components {
+    /* Custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        @apply bg-gray-100;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gray-400 rounded-full;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-500;
+    }
+}
+
+@layer utilities {
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-in-out;
+    }
+
+    .animate-slide-up {
+        animation: slide-up 0.5s ease-out;
+    }
+
+    .animate-slide-down {
+        animation: slide-down 0.5s ease-out;
+    }
+
+    .animate-scale-in {
+        animation: scale-in 0.3s ease-out;
+    }
 }
