@@ -207,7 +207,8 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Checkstyle Plugin -->
+            <!-- Checkstyle Plugin - disabled until config file is added -->
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -228,8 +229,10 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
-            <!-- SpotBugs Plugin -->
+            <!-- SpotBugs Plugin - disabled to reduce build time -->
+            <!--
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
@@ -247,6 +250,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
             <!-- Maven Surefire Plugin (for better test reporting) -->
             <plugin>

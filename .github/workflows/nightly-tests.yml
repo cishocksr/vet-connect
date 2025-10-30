@@ -50,10 +50,11 @@ jobs:
           name: maven-site
           path: apps/backend/target/site/
 
-      - name: Notify on failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: 'Nightly tests failed!'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      # Slack notification disabled until SLACK_WEBHOOK secret is configured
+      # - name: Notify on failure
+      #   if: failure()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     text: 'Nightly tests failed!'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}
