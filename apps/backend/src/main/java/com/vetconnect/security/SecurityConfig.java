@@ -77,8 +77,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // PUBLIC ENDPOINTS (no authentication required)
 
-                        // Authentication endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Authentication endpoints (public except /me)
+                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/refresh").permitAll()
+
+                        // Current user endpoint (requires authentication)
+                        .requestMatchers("/api/auth/me").authenticated()
 
                         // Swagger/OpenAPI documentation
                         .requestMatchers(
@@ -87,6 +92,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
+
+                        // ... rest of your configuration
 
                         // Health check endpoints
                         .requestMatchers("/actuator/health").permitAll()
