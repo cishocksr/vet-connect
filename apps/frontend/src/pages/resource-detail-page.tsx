@@ -157,7 +157,7 @@ export default function ResourceDetailPage() {
                             ) : (
                                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                     <DialogTrigger asChild>
-                                        <Button className="bg-military-navy hover:bg-military-navy/90">
+                                        <Button className="bg-military-navy text-white hover:bg-military-navy/90 hover:text-white">
                                             <BookmarkPlus className="h-4 w-4 mr-2" />
                                             Save
                                         </Button>
@@ -178,7 +178,7 @@ export default function ResourceDetailPage() {
                                             />
                                             <Button
                                                 onClick={handleSave}
-                                                className="w-full bg-military-navy"
+                                                className="w-full bg-military-navy text-white hover:bg-military-navy/90 hover:text-white"
                                                 disabled={saveMutation.isPending}
                                             >
                                                 {saveMutation.isPending ? (

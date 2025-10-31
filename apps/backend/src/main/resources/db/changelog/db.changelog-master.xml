@@ -10,6 +10,6 @@
     <include file="db/changelog/changes/002-create-resources-categories-table.xml"/>
     <include file="db/changelog/changes/003-create-resources-table.xml"/>
     <include file="db/changelog/changes/004-create-saved-resources-table.xml"/>
-    <include file="db/changelog/changes/005-insert-initial-categories.xml"/>
-
+    <include file="changes/005-insert-initial-categories.xml" relativeToChangelogFile="true"/>
+    <include file="changes/006-insert-sample-resources.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

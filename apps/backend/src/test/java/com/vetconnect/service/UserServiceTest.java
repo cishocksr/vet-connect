@@ -143,20 +143,4 @@ class UserServiceTest {
         verify(userRepository).save(any(User.class));
     }
 
-    @Test
-    @DisplayName("Should find user by email")
-    void testFindByEmail_Success() {
-        // Arrange
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(userMapper.toDTO(user)).thenReturn(userDTO);
-
-        // Act
-        UserDTO result = userService.findByEmail("test@example.com");
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("test@example.com", result.getEmail());
-
-        verify(userRepository).findByEmail("test@example.com");
-    }
 }

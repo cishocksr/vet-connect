@@ -190,6 +190,55 @@ public class ResourceService {
                 .build();
     }
 
+    /**
+     * Search resources with filters (simplified version)
+     * Returns PageResponse directly instead of ResourceSearchResponse
+     *
+     * This method is used by the REST API to return a simpler response
+     * that matches the frontend's expectations.
+     *
+     * @param searchRequest Search criteria
+     * @return PageResponse of ResourceSummaryDTOs
+     */
+    public PageResponse<ResourceSummaryDTO> searchResourcesSimple(ResourceSearchRequest searchRequest) {
+        log.debug("Searching resources (simple) with filters: {}", searchRequest);
+
+        // Build sort
+        Sort sort = Sort.by(
+                searchRequest.getSortDirection().equalsIgnoreCase("DESC")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC,
+                searchRequest.getSortBy()
+        );
+
+        // Build pageable
+        Pageable pageable = PageRequest.of(
+                searchRequest.getPage(),
+                searchRequest.getValidatedSize(),
+                sort
+        );
+
+        // Get category entity if category filter is provided
+        ResourceCategory category = null;
+        if (searchRequest.getCategoryId() != null) {
+            category = categoryService.getCategoryEntityById(searchRequest.getCategoryId());
+        }
+
+        // Use the existing searchWithFilters method
+        // It handles all combinations of filters (category, state, keyword)
+        Page<Resource> resourcePage = resourceRepository.searchWithFilters(
+                category,
+                searchRequest.getState(),
+                searchRequest.getKeyword(),
+                pageable
+        );
+
+        // Map to DTOs
+        Page<ResourceSummaryDTO> dtoPage = resourcePage.map(resourceMapper::toSummaryDTO);
+
+        return PageResponse.fromPage(dtoPage);
+    }
+
     // ========== WRITE OPERATIONS ==========
 
     /**

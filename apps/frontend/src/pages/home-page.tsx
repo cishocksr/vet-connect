@@ -119,7 +119,7 @@ export default function HomePage() {
                                         asChild
                                         size="lg"
                                         variant="outline"
-                                        className="border-2 border-white text-white hover:bg-white hover:text-military-navy font-semibold"
+                                        className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-military-navy font-semibold"
                                     >
                                         <Link to="/dashboard">
                                             <BookmarkCheck className="mr-2 h-5 w-5" />

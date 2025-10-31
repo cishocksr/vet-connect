@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="006-insert-sample-resources" author="developer">
+
+        <!-- ============================================ -->
+        <!-- HOUSING RESOURCES (Category ID: 1)           -->
+        <!-- ============================================ -->
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="1"/>
+            <column name="name" value="HUD-VASH Housing Program"/>
+            <column name="description" value="The HUD-VA Supportive Housing (HUD-VASH) program combines Housing Choice Voucher (HCV) rental assistance for homeless Veterans with case management and clinical services provided by the Department of Veterans Affairs. VA provides these services for participating Veterans at VA medical centers (VAMCs) and community-based outreach clinics."/>
+            <column name="website_url" value="https://www.va.gov/homeless/hud-vash.asp"/>
+            <column name="phone_number" value="1-877-424-3838"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans who are homeless and have a VA qualifying chronic health condition such as mental illness, substance use disorder, or physical disability"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="1"/>
+            <column name="name" value="VA Grant and Per Diem Program"/>
+            <column name="description" value="Offers grants to community organizations that provide transitional housing and service centers for homeless Veterans. The program promotes the development and provision of supportive housing and services with the goal of helping homeless Veterans achieve residential stability, increase their skill levels, and improve their income."/>
+            <column name="website_url" value="https://www.va.gov/homeless/gpd.asp"/>
+            <column name="phone_number" value="1-877-424-3838"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Homeless Veterans seeking transitional housing assistance"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="1"/>
+            <column name="name" value="Swords to Plowshares"/>
+            <column name="description" value="Provides comprehensive services to homeless and at-risk Veterans in the San Francisco Bay Area including housing placement, case management, employment services, and legal assistance."/>
+            <column name="website_url" value="https://www.swords-to-plowshares.org"/>
+            <column name="phone_number" value="415-252-4788"/>
+            <column name="email" value="info@swords-to-plowshares.org"/>
+            <column name="address_line1" value="1060 Howard Street"/>
+            <column name="city" value="San Francisco"/>
+            <column name="state" value="CA"/>
+            <column name="zip_code" value="94103"/>
+            <column name="is_national" valueBoolean="false"/>
+            <column name="eligibility_criteria" value="Veterans in the San Francisco Bay Area"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="1"/>
+            <column name="name" value="U.S. VETS"/>
+            <column name="description" value="The largest nonprofit provider of comprehensive services to homeless and at-risk Veterans nationwide. Provides housing, case management, employment assistance, and counseling services."/>
+            <column name="website_url" value="https://www.usvetsinc.org"/>
+            <column name="phone_number" value="800-838-4357"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Homeless and at-risk Veterans"/>
+        </insert>
+
+        <!-- ============================================ -->
+        <!-- FINANCIAL RESOURCES (Category ID: 2)         -->
+        <!-- ============================================ -->
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="name" value="VA Disability Compensation"/>
+            <column name="description" value="Monthly tax-free payment to Veterans who got sick or injured while serving in the military and to Veterans whose service made an existing condition worse. You may qualify for VA disability benefits for physical conditions and mental health conditions."/>
+            <column name="website_url" value="https://www.va.gov/disability/"/>
+            <column name="phone_number" value="1-800-827-1000"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans with service-connected disabilities rated at 10% or higher"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="name" value="VA Pension Benefits"/>
+            <column name="description" value="Tax-free monetary benefit for wartime Veterans with limited income who are age 65 or older, or who have a permanent and total disability, or who are a patient in a nursing home, or who are receiving Social Security disability benefits."/>
+            <column name="website_url" value="https://www.va.gov/pension/"/>
+            <column name="phone_number" value="1-800-827-1000"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Wartime Veterans age 65+ or with permanent disabilities and limited income"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="name" value="VA Home Loan Guaranty"/>
+            <column name="description" value="VA-backed home loans help Veterans, service members, and their surviving spouses become homeowners. Through this program, lenders can offer favorable loan terms with no down payment or private mortgage insurance required."/>
+            <column name="website_url" value="https://www.va.gov/housing-assistance/home-loans/"/>
+            <column name="phone_number" value="1-877-827-3702"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans with sufficient service time and satisfactory credit"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="name" value="Wounded Warrior Project Financial Assistance"/>
+            <column name="description" value="Emergency financial assistance for wounded Veterans facing financial hardship. Provides support for basic needs including rent, utilities, vehicle payments, and other essential expenses."/>
+            <column name="website_url" value="https://www.woundedwarriorproject.org"/>
+            <column name="phone_number" value="1-888-997-2586"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Post-9/11 Veterans with service-connected injuries"/>
+        </insert>
+
+        <!-- ============================================ -->
+        <!-- EDUCATION RESOURCES (Category ID: 3)         -->
+        <!-- ============================================ -->
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="3"/>
+            <column name="name" value="Post-9/11 GI Bill"/>
+            <column name="description" value="The Post-9/11 GI Bill helps you pay for school or job training. If you've served on active duty after September 10, 2001, you may qualify for this VA-administered education benefit. Benefits include tuition and fees, monthly housing allowance, and books and supplies stipend."/>
+            <column name="website_url" value="https://www.va.gov/education/about-gi-bill-benefits/post-9-11/"/>
+            <column name="phone_number" value="1-888-442-4551"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans with at least 90 days of aggregate active duty service after 9/10/2001"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="3"/>
+            <column name="name" value="Vocational Rehabilitation and Employment (VR&amp;E)"/>
+            <column name="description" value="Also called Chapter 31, this program helps Veterans with service-connected disabilities prepare for, find, and keep suitable jobs. For Veterans with service-connected disabilities so severe that they cannot work, VR&amp;E offers services to help them live as independently as possible."/>
+            <column name="website_url" value="https://www.va.gov/careers-employment/vocational-rehabilitation/"/>
+            <column name="phone_number" value="1-800-827-1000"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans with service-connected disability rating of at least 10%"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="3"/>
+            <column name="name" value="Veterans Upward Bound"/>
+            <column name="description" value="Free program designed to help Veterans refresh their academic skills so that they can successfully complete the post-secondary education of their choosing. Services include assessment, tutoring, counseling, and instruction in core subjects."/>
+            <column name="website_url" value="https://www.va.gov/education/other-va-education-benefits/veteran-upward-bound/"/>
+            <column name="phone_number" value="1-888-442-4551"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans who are low-income or first-generation college students"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="3"/>
+            <column name="name" value="Troops to Teachers"/>
+            <column name="description" value="Helps eligible military personnel begin new careers as teachers in public schools. Provides assistance with teacher certification and employment in schools that serve students from low-income families."/>
+            <column name="website_url" value="https://proudtoserveagain.com"/>
+            <column name="phone_number" value="1-800-231-6242"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans and transitioning service members interested in teaching careers"/>
+        </insert>
+
+        <!-- ============================================ -->
+        <!-- MENTAL HEALTH RESOURCES (Category ID: 4)     -->
+        <!-- ============================================ -->
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="4"/>
+            <column name="name" value="Veterans Crisis Line"/>
+            <column name="description" value="Free, confidential support for Veterans in crisis and their families and friends 24/7/365. Connect with a caring, qualified responder through a confidential toll-free hotline, online chat, or text messaging service."/>
+            <column name="website_url" value="https://www.veteranscrisisline.net"/>
+            <column name="phone_number" value="988 (Press 1)"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="All Veterans, service members, National Guard, Reserve, and their families and friends"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="4"/>
+            <column name="name" value="VA PTSD Program Locator"/>
+            <column name="description" value="Find specialized PTSD treatment programs at VA medical centers across the country. These programs offer evidence-based treatments including Cognitive Processing Therapy and Prolonged Exposure therapy delivered by trained PTSD specialists."/>
+            <column name="website_url" value="https://www.va.gov/directory/guide/ptsd.asp"/>
+            <column name="phone_number" value="1-800-827-1000"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans enrolled in VA health care"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="4"/>
+            <column name="name" value="Vet Centers"/>
+            <column name="description" value="Community-based counseling centers that provide a wide range of social and psychological services, including professional readjustment counseling to Veterans, active duty service members, and their families. Services include individual and group counseling for PTSD, depression, bereavement, and military sexual trauma."/>
+            <column name="website_url" value="https://www.va.gov/find-locations/?facilityType=vet_center"/>
+            <column name="phone_number" value="1-877-927-8387"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans who served in any combat zone, provided military emergency response, or experienced military sexual trauma"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="4"/>
+            <column name="name" value="Give an Hour"/>
+            <column name="description" value="National nonprofit providing free mental health services to military members, Veterans, and their families. Network of licensed mental health professionals donate their time to provide counseling services at no cost."/>
+            <column name="website_url" value="https://giveanhour.org"/>
+            <column name="phone_number" value="202-556-3714"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Current and former military service members and their families"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="4"/>
+            <column name="name" value="Cohen Veterans Network"/>
+            <column name="description" value="Network of mental health clinics for post-9/11 Veterans and their families offering high-quality, accessible, and integrated mental health care at no cost."/>
+            <column name="website_url" value="https://www.cohenveteransnetwork.org"/>
+            <column name="phone_number" value="203-908-9770"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Post-9/11 Veterans and their families"/>
+        </insert>
+
+        <!-- ============================================ -->
+        <!-- HEALTHCARE RESOURCES (Category ID: 5)        -->
+        <!-- ============================================ -->
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="name" value="VA Health Care Enrollment"/>
+            <column name="description" value="Apply for VA health care benefits. Once enrolled, you can get care at VA medical centers and clinics near you. VA health care covers preventive care services, inpatient and outpatient services, prescriptions, mental health care, and more."/>
+            <column name="website_url" value="https://www.va.gov/health-care/how-to-apply/"/>
+            <column name="phone_number" value="1-877-222-8387"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans who served in active military and were discharged under conditions other than dishonorable"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="name" value="VA Telehealth Services"/>
+            <column name="description" value="Connect with your VA health care team from your home or anywhere you have an internet connection. VA Video Connect allows you to meet with your VA provider through live video on your computer, tablet, or mobile device."/>
+            <column name="website_url" value="https://www.va.gov/health-care/covid-19-vaccine/"/>
+            <column name="phone_number" value="1-877-222-8387"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans enrolled in VA health care"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="name" value="VA Dental Benefits"/>
+            <column name="description" value="Dental care for eligible Veterans including preventive services, restorative services, and emergency care. Eligibility varies based on service-connected disability rating and other factors."/>
+            <column name="website_url" value="https://www.va.gov/health-care/about-va-health-benefits/dental-care/"/>
+            <column name="phone_number" value="1-877-222-8387"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Veterans with service-connected dental conditions or disabilities rated 100%"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="name" value="TRICARE For Life"/>
+            <column name="description" value="Medicare-wraparound coverage for those who are 65 or older, or under 65 and eligible for Medicare Part A because of a disability or end-stage renal disease. Provides comprehensive health coverage."/>
+            <column name="website_url" value="https://www.tricare.mil/tfl"/>
+            <column name="phone_number" value="1-866-773-0404"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Military retirees age 65+ enrolled in Medicare Part A and Part B"/>
+        </insert>
+
+        <insert tableName="resources">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="name" value="VA Caregiver Support Program"/>
+            <column name="description" value="Support services for family caregivers of Veterans including education, resources, support services, and financial assistance for caregivers of seriously injured post-9/11 Veterans."/>
+            <column name="website_url" value="https://www.caregiver.va.gov"/>
+            <column name="phone_number" value="1-855-260-3274"/>
+            <column name="is_national" valueBoolean="true"/>
+            <column name="eligibility_criteria" value="Family caregivers of eligible Veterans"/>
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>

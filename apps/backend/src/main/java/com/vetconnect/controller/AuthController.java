@@ -4,6 +4,8 @@ import com.vetconnect.dto.auth.AuthResponse;
 import com.vetconnect.dto.auth.LoginRequest;
 import com.vetconnect.dto.auth.RegisterRequest;
 import com.vetconnect.dto.common.ApiResponse;
+import com.vetconnect.dto.user.UserDTO;
+import com.vetconnect.security.CustomUserDetails;
 import com.vetconnect.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -116,6 +119,42 @@ public class AuthController {
         return ResponseEntity.ok(
                 ApiResponse.success("Login successful", authResponse)
         );
+    }
+
+    /**
+     * Get current authenticated user
+     *
+     * GET /api/auth/me
+     *
+     * Headers:
+     * Authorization: Bearer <token>
+     *
+     * Response: 200 OK
+     * {
+     *   "success": true,
+     *   "message": "User retrieved successfully",
+     *   "data": {
+     *     "id": "123e4567-e89b-12d3-a456-426614174000",
+     *     "email": "veteran@example.com",
+     *     "firstName": "John",
+     *     "lastName": "Doe",
+     *     "fullName": "John Doe",
+     *     "branchOfService": "ARMY",
+     *     ...
+     *   }
+     * }
+     */
+    @GetMapping("/me")
+    @Operation(summary = "Get current user", description = "Get authenticated user's profile")
+    public ResponseEntity<ApiResponse<UserDTO>> getCurrentUser(
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+
+        log.debug("Getting current user: {}", currentUser.getEmail());
+
+        UserDTO userDTO = authService.getCurrentUser(currentUser.getId());
+
+        return ResponseEntity.ok(
+                ApiResponse.success("User retrieved successfully", userDTO));
     }
 
     /**

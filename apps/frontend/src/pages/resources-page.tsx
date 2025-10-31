@@ -142,12 +142,12 @@ export default function ResourcesPage() {
                             {/* Category Filter */}
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Category</label>
-                                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                <Select value={selectedCategory || 'all'} onValueChange={(value) => setSelectedCategory(value === 'all' ? '' : value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="All categories" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All categories</SelectItem>
+                                        <SelectItem value="all">All categories</SelectItem>
                                         {categories?.map((cat) => (
                                             <SelectItem key={cat.id} value={String(cat.id)}>
                                                 {cat.name}
@@ -160,12 +160,12 @@ export default function ResourcesPage() {
                             {/* State Filter */}
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">State</label>
-                                <Select value={selectedState} onValueChange={setSelectedState}>
+                                <Select value={selectedState || 'all'} onValueChange={(value) => setSelectedState(value === 'all' ? '' : value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="All states" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All states</SelectItem>
+                                        <SelectItem value="all">All states</SelectItem>
                                         {US_STATES.map((state) => (
                                             <SelectItem key={state} value={state}>
                                                 {state}

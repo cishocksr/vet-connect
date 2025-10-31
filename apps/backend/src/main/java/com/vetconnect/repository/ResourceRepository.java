@@ -121,9 +121,9 @@ public interface ResourceRepository extends JpaRepository<Resource, UUID> {
     @Query("SELECT r FROM Resource r WHERE " +
             "(:category IS NULL OR r.category = :category) AND " +
             "(:state IS NULL OR r.isNational = true OR r.state = :state) AND " +
-            "(:keyword IS NULL OR " +
-            "LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+            "(CAST(:keyword AS string) IS NULL OR " +
+            "LOWER(r.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')) OR " +
+            "LOWER(r.description) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')))")
     Page<Resource> searchWithFilters(
             @Param("category") ResourceCategory category,
             @Param("state") String state,

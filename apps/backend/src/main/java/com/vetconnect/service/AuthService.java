@@ -5,6 +5,7 @@ import com.vetconnect.dto.auth.LoginRequest;
 import com.vetconnect.dto.auth.RegisterRequest;
 import com.vetconnect.dto.user.UserDTO;
 import com.vetconnect.exception.EmailAlreadyExistsException;
+import com.vetconnect.exception.ResourceNotFoundException;
 import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
 import com.vetconnect.repository.UserRepository;
@@ -19,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 /**
  * Service for authentication operations
@@ -174,6 +177,21 @@ public class AuthService {
             log.error("Failed login attempt for: {}", loginRequest.getEmail());
             throw new RuntimeException("Invalid email or password");
         }
+    }
+
+    /**
+     * Get current user by ID
+     *
+     * @param userId User ID from JWT token
+     * @return UserDTO
+     */
+    public UserDTO getCurrentUser(UUID userId) {
+        log.debug("Getting user by ID: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return userMapper.toDTO(user);
     }
 
     /**

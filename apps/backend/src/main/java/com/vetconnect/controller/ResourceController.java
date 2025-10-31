@@ -118,34 +118,38 @@ public class ResourceController {
     }
 
     /**
-     * Search resources
+     * Search resources with filters
      *
-     * GET /api/resources/search?keyword=housing&categoryId=1&state=VA&page=0&size=20
+     * GET /api/resources/search?keyword=housing&category=1&state=VA&page=0&size=20
      *
      * Query Parameters (all optional):
      * - keyword: Search term
-     * - categoryId: Filter by category
-     * - state: Filter by state
+     * - categoryId: Filter by category ID
+     * - state: Filter by state (2-letter code)
      * - includeNational: Include national resources (default: true)
      * - page: Page number (default: 0)
      * - size: Page size (default: 20)
      * - sortBy: Sort field (default: "name")
-     * - sortDirection: Sort direction "ASC" or "DESC" (default: "ASC")
+     * - sortDirection: ASC or DESC (default: "ASC")
      *
      * Response: 200 OK
      * {
      *   "success": true,
-     *   "message": "Search completed successfully",
+     *   "message": "Resources found",
      *   "data": {
-     *     "results": { ...paginated results... },
-     *     "searchMetadata": { ...search criteria... }
+     *     "content": [ ...array of resources... ],
+     *     "pageNumber": 0,
+     *     "pageSize": 20,
+     *     "totalElements": 47,
+     *     "totalPages": 3,
+     *     ...
      *   }
      * }
      */
     @GetMapping("/search")
     @Operation(summary = "Search resources",
-            description = "Search and filter resources with multiple criteria")
-    public ResponseEntity<ApiResponse<ResourceSearchResponse>> searchResources(
+            description = "Search resources with keyword, category, and state filters")
+    public ResponseEntity<ApiResponse<PageResponse<ResourceSummaryDTO>>> searchResources(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) String state,
@@ -155,9 +159,10 @@ public class ResourceController {
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDirection) {
 
-        log.debug("Searching resources - keyword: {}, category: {}, state: {}",
-                keyword, categoryId, state);
+        log.debug("Searching resources - keyword: {}, category: {}, state: {}, page: {}",
+                keyword, categoryId, state, page);
 
+        // Build search request
         ResourceSearchRequest searchRequest = ResourceSearchRequest.builder()
                 .keyword(keyword)
                 .categoryId(categoryId)
@@ -169,10 +174,15 @@ public class ResourceController {
                 .sortDirection(sortDirection)
                 .build();
 
-        ResourceSearchResponse searchResponse = resourceService.searchResources(searchRequest);
+        // Get results - use the simpler method that returns PageResponse
+        PageResponse<ResourceSummaryDTO> results = resourceService.searchResourcesSimple(searchRequest);
+
+        String message = results.getTotalElements() > 0
+                ? String.format("Found %d resources", results.getTotalElements())
+                : "No resources found";
 
         return ResponseEntity.ok(
-                ApiResponse.success("Search completed successfully", searchResponse)
+                ApiResponse.success(message, results)
         );
     }
 
