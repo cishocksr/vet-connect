@@ -50,6 +50,7 @@ public class User {
     @Column(name = "branch_of_service", nullable = false, length = 50)
     private BranchOfService branchOfService;
 
+
     @Size(max = 255, message = "Address line 1 must be less than 255 characters")
     @Column(name = "address_line1", length =255)
     private String addressLine1;
@@ -73,6 +74,10 @@ public class User {
     @Column(name = "is_homeless", nullable = false)
     @Builder.Default
     private boolean isHomeless = false;
+
+    @Size(max = 500, message = "Profile picture URL must be less than 500 characters")
+    @Column(name = "profile_picture_url", length = 500)
+    private String profilePictureUrl;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

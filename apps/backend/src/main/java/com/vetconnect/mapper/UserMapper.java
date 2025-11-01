@@ -50,6 +50,7 @@ public class UserMapper {
                 .zipCode(user.getZipCode())
                 .isHomeless(user.isHomeless())
                 .hasCompleteAddress(user.hasCompleteAddress())  // Computed from entity
+                .profilePictureUrl(user.getProfilePictureUrl())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
@@ -76,6 +77,7 @@ public class UserMapper {
                 .fullName(user.getFullName())
                 .branchOfService(user.getBranchOfService())
                 .branchDisplayName(user.getBranchOfService().getDisplayName())
+                .profilePictureUrl(user.getProfilePictureUrl())
                 .city(user.getCity())  // Only city/state for privacy
                 .state(user.getState())
                 .build();

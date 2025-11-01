@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import {Avatar, AvatarFallback, AvatarImage} from '../ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { getInitials } from '@/lib/utils';
 import {
@@ -82,17 +82,26 @@ export function Navbar() {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-white/10">
                                         <Avatar>
+                                            {user.profilePictureUrl && (
+                                                <AvatarImage
+                                                    src={user.profilePictureUrl}
+                                                    alt={user.fullName}
+                                                />
+                                            )}
                                             <AvatarFallback className="bg-gradient-to-br from-military-gold to-military-army-gold text-military-navy font-bold">
                                                 {getInitials(user.firstName, user.lastName)}
                                             </AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="w-56 z-[100] bg-white dark:bg-gray-800 shadow-lg border border-gray-200"
+                                >
                                     <DropdownMenuLabel>
                                         <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium">{user.fullName}</p>
-                                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                                            <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
+                                            <p className="text-xs text-gray-500">{user.email}</p>
                                             <p className="text-xs text-military-green font-medium">
                                                 {user.branchDisplayName}
                                             </p>
@@ -108,7 +117,7 @@ export function Navbar() {
                                         Profile
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={logout} className="text-red-600">
+                                    <DropdownMenuItem onClick={logout} variant="destructive">
                                         <LogOut className="mr-2 h-4 w-4" />
                                         Logout
                                     </DropdownMenuItem>

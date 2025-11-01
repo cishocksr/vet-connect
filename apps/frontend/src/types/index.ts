@@ -14,7 +14,9 @@ export interface User {
     state?: string;
     zipCode?: string;
     isHomeless: boolean;
+    profilePictureUrl?: string;  // ADD THIS
     createdAt: string;
+    updatedAt: string;
 }
 
 export type BranchOfService =
@@ -141,4 +143,34 @@ export interface ResourceSearchParams {
     state?: string;
     page?: number;
     size?: number;
+}
+
+// Profile Update Request
+export interface UpdateProfileRequest {
+    firstName?: string;
+    lastName?: string;
+    branchOfService?: BranchOfService;
+    addressLine1?: string;
+    addressLine2?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    isHomeless?: boolean;
+}
+
+// Address Update Request (separate for focused address updates)
+export interface UpdateAddressRequest {
+    addressLine1?: string;
+    addressLine2?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    isHomeless?: boolean;
+}
+
+// Password Change Request
+export interface UpdatePasswordRequest {
+    currentPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
 }

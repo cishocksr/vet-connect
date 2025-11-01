@@ -1,5 +1,5 @@
 import api from './api';
-import type { User, ApiResponse } from '../types';
+import type { User, ApiResponse, UpdateProfileRequest, UpdateAddressRequest, UpdatePasswordRequest } from '../types';
 
 /**
  * User Service
@@ -16,11 +16,26 @@ class UserService {
     }
 
     /**
-     * Update user profile
+     * Update user profile (partial update)
      */
-    async updateProfile(data: Partial<User>): Promise<User> {
+    async updateProfile(data: UpdateProfileRequest): Promise<User> {
         const response = await api.put<ApiResponse<User>>('/users/profile', data);
         return response.data.data;
+    }
+
+    /**
+     * Update address specifically
+     */
+    async updateAddress(data: UpdateAddressRequest): Promise<User> {
+        const response = await api.patch<ApiResponse<User>>('/users/address', data);
+        return response.data.data;
+    }
+
+    /**
+     * Change password
+     */
+    async changePassword(data: UpdatePasswordRequest): Promise<void> {
+        await api.put<ApiResponse<void>>('/users/password', data);
     }
 
     /**
@@ -28,6 +43,33 @@ class UserService {
      */
     async getUserProfile(userId: string): Promise<User> {
         const response = await api.get<ApiResponse<User>>(`/users/${userId}`);
+        return response.data.data;
+    }
+
+    /**
+     * Upload profile picture
+     */
+    async uploadProfilePicture(file: File): Promise<User> {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await api.post<ApiResponse<User>>(
+            '/users/profile-picture',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data.data;
+    }
+
+    /**
+     * Delete profile picture
+     */
+    async deleteProfilePicture(): Promise<User> {
+        const response = await api.delete<ApiResponse<User>>('/users/profile-picture');
         return response.data.data;
     }
 }

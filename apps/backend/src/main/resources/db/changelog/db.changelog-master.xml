@@ -3,13 +3,14 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- Include all changelog files in order -->
-    <include file="db/changelog/changes/001-create-users-table.xml"/>
-    <include file="db/changelog/changes/002-create-resources-categories-table.xml"/>
-    <include file="db/changelog/changes/003-create-resources-table.xml"/>
-    <include file="db/changelog/changes/004-create-saved-resources-table.xml"/>
+    <include file="changes/001-create-users-table.xml" relativeToChangelogFile="true"/>
+    <include file="changes/002-create-resources-categories-table.xml" relativeToChangelogFile="true"/>
+    <include file="changes/003-create-resources-table.xml" relativeToChangelogFile="true"/>
+    <include file="changes/004-create-saved-resources-table.xml" relativeToChangelogFile="true"/>
     <include file="changes/005-insert-initial-categories.xml" relativeToChangelogFile="true"/>
     <include file="changes/006-insert-sample-resources.xml" relativeToChangelogFile="true"/>
+    <include file="changes/007-add-profile-picture-to-users.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

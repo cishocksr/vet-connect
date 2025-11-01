@@ -1,6 +1,12 @@
 spring:
   application:
     name: vet-connect-backend
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 
   datasource:
     url: jdbc:postgresql://localhost:5432/vet_connect
@@ -70,3 +76,6 @@ app:
   api:
     version: v1
     base-path: /api
+  upload:
+    dir: uploads/profile-pictures
+    max-file-size: 5242880  # 5MB in by
