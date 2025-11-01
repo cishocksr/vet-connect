@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/layout/navbar.tsx';
 import { Footer } from './components/layout/footer.tsx';
 import { ProtectedRoute } from './components/auth/protected-route.tsx';
+import { ScrollToTop } from './components/layout/scroll-to-top.tsx';
 
 // Pages (we'll create these next)
 import HomePage from './pages/home-page';
@@ -15,6 +16,8 @@ import ProfilePage from './pages/profile.tsx';
 function App() {
     return (
         <div className="flex flex-col min-h-screen">
+            <ScrollToTop />
+
             <Navbar />
             <main className="flex-1">
                 <Routes>

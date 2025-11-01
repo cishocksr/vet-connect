@@ -39,7 +39,7 @@ export default function ProfilePage() {
                                 <Shield className="h-4 w-4" />
                                 Branch of Service
                             </label>
-                            <Badge className="mt-1 bg-military-green">
+                            <Badge className="mt-1 bg-military-green text-white">
                                 {user.branchDisplayName}
                             </Badge>
                         </div>
