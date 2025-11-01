@@ -35,6 +35,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'apps/backend/pom.xml'
 
       - name: Run all tests
         working-directory: ./apps/backend
