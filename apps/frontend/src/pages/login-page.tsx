@@ -26,7 +26,8 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
 
     // Get the page they were trying to access (if redirected from protected route)
-    const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const from = (location.state as any)?.from?.pathname || '/';
 
     const {
         register,
@@ -47,7 +48,8 @@ export default function LoginPage() {
 
     // Extract error message
     const errorMessage = loginError
-        ? (loginError as { response?: { data?: { message?: string } } }).response?.data?.message || 'Login failed. Please try again.'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? (loginError as any).response?.data?.message || 'Login failed. Please try again.'
         : null;
 
     return (

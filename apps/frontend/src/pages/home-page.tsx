@@ -22,7 +22,9 @@ import {
     BookmarkCheck
 } from 'lucide-react';
 
-const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+import type { LucideIcon } from 'lucide-react';
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
     'home': Home,
     'dollar-sign': DollarSign,
     'graduation-cap': GraduationCap,

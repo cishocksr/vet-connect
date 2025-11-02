@@ -23,7 +23,7 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 // Mock IntersectionObserver for framer-motion
-global.IntersectionObserver = class IntersectionObserver {
+globalThis.IntersectionObserver = class IntersectionObserver {
     observe = vi.fn()
     unobserve = vi.fn()
     disconnect = vi.fn()
@@ -31,11 +31,11 @@ global.IntersectionObserver = class IntersectionObserver {
     rootMargin = ''
     thresholds = []
     takeRecords = vi.fn().mockReturnValue([])
-}
+} as unknown as typeof IntersectionObserver
 
 // Mock ResizeObserver
-global.ResizeObserver = class ResizeObserver {
+globalThis.ResizeObserver = class ResizeObserver {
     observe = vi.fn()
     unobserve = vi.fn()
     disconnect = vi.fn()
-}
+} as unknown as typeof ResizeObserver
