@@ -65,7 +65,7 @@ export default function ResourcesPage() {
 
     // Handle search
     const handleSearch = () => {
-        const newParams: any = {};
+        const newParams: Record<string, string> = {};
         if (keyword) newParams.keyword = keyword;
         if (selectedCategory) newParams.category = selectedCategory;
         if (selectedState) newParams.state = selectedState;
@@ -86,7 +86,7 @@ export default function ResourcesPage() {
     // Handle page change
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
-        const newParams: any = {};
+        const newParams: Record<string, string> = {};
         if (keyword) newParams.keyword = keyword;
         if (selectedCategory) newParams.category = selectedCategory;
         if (selectedState) newParams.state = selectedState;

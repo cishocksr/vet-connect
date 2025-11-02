@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/use-auth';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar';
+import { ProfilePictureUpload } from '../components/profile/profile-picture-upload';
 import {
     Dialog,
     DialogContent,
@@ -22,9 +22,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '../components/ui/select';
-import { getInitials } from '../lib/utils';
 import userService from '../services/user-service';
-import { User, Mail, MapPin, Shield, Edit, Loader2, Camera, X } from 'lucide-react';
+import { User, Mail, MapPin, Shield, Edit, Loader2 } from 'lucide-react';
 import type { BranchOfService } from '../types';
 
 export default function ProfilePage() {
@@ -44,57 +43,17 @@ export default function ProfilePage() {
     const [state, setState] = useState(user?.state || '');
     const [zipCode, setZipCode] = useState(user?.zipCode || '');
 
-    // Profile picture state
-    const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
-    const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
-
     // Update profile mutation
     const updateMutation = useMutation({
-        mutationFn: (data: Partial<typeof user>) => userService.updateProfile(data),
+        mutationFn: (data: Parameters<typeof userService.updateProfile>[0]) => userService.updateProfile(data),
         onSuccess: (updatedUser) => {
             setUser(updatedUser);
             queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
             setIsEditOpen(false);
-            // Clear preview
-            setProfilePicturePreview(null);
-            setProfilePictureFile(null);
         },
     });
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                alert('Please select an image file');
-                return;
-            }
-
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Image must be less than 5MB');
-                return;
-            }
-
-            setProfilePictureFile(file);
-
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfilePicturePreview(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleRemoveImage = () => {
-        setProfilePicturePreview(null);
-        setProfilePictureFile(null);
-    };
-
     const handleSave = () => {
-        // TODO: When backend is ready, upload the image first
-        // For now, just update the text fields
         updateMutation.mutate({
             firstName,
             lastName,
@@ -132,62 +91,6 @@ export default function ProfilePage() {
                             </DialogHeader>
 
                             <div className="space-y-4 py-4">
-                                {/* Profile Picture Upload */}
-                                <div className="space-y-2">
-                                    <Label>Profile Picture</Label>
-                                    <div className="flex items-center gap-4">
-                                        <div className="relative">
-                                            <Avatar className="h-20 w-20">
-                                                {profilePicturePreview ? (
-                                                    <AvatarImage
-                                                        src={profilePicturePreview}
-                                                        alt="Preview"
-                                                    />
-                                                ) : user.profilePictureUrl ? (
-                                                    <AvatarImage
-                                                        src={user.profilePictureUrl}
-                                                        alt={user.fullName}
-                                                    />
-                                                ) : (
-                                                    <AvatarFallback className="bg-gradient-to-br from-military-gold to-military-army-gold text-military-navy font-bold text-2xl">
-                                                        {getInitials(user.firstName, user.lastName)}
-                                                    </AvatarFallback>
-                                                )}
-                                            </Avatar>
-                                            {profilePicturePreview && (
-                                                <button
-                                                    onClick={handleRemoveImage}
-                                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                                className="hidden"
-                                                id="profile-picture-upload"
-                                            />
-                                            <Label
-                                                htmlFor="profile-picture-upload"
-                                                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                                            >
-                                                <Camera className="h-4 w-4" />
-                                                {profilePicturePreview ? 'Change Photo' : 'Upload Photo'}
-                                            </Label>
-                                            <p className="text-xs text-gray-500 mt-2">
-                                                Max 5MB. JPG, PNG, or GIF.
-                                            </p>
-                                            <p className="text-xs text-yellow-600 mt-1">
-                                                Note: Image upload backend coming soon!
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 {/* First Name */}
                                 <div className="space-y-2">
                                     <Label htmlFor="firstName">First Name</Label>
@@ -306,16 +209,9 @@ export default function ProfilePage() {
                     </Dialog>
                 </div>
 
-                {/* Profile Picture Section */}
-                <div className="flex justify-center mb-8">
-                    <Avatar className="h-32 w-32">
-                        {user.profilePictureUrl && (
-                            <AvatarImage src={user.profilePictureUrl} alt={user.fullName} />
-                        )}
-                        <AvatarFallback className="bg-gradient-to-br from-military-gold to-military-army-gold text-military-navy font-bold text-4xl">
-                            {getInitials(user.firstName, user.lastName)}
-                        </AvatarFallback>
-                    </Avatar>
+                {/* Profile Picture Upload Component */}
+                <div className="mb-8">
+                    <ProfilePictureUpload user={user} />
                 </div>
 
                 <Card>

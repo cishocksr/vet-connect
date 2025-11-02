@@ -1,11 +1,12 @@
 import { useState, useRef } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Camera, X, Loader2 } from 'lucide-react';
 import userService from '@/services/user-service';
 import { toast } from 'sonner';
 import { getInitials } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 import type { User } from '@/types';
 
 interface ProfilePictureUploadProps {
@@ -13,7 +14,7 @@ interface ProfilePictureUploadProps {
 }
 
 export function ProfilePictureUpload({ user }: ProfilePictureUploadProps) {
-    const queryClient = useQueryClient();
+    const { setUser } = useAuth(); // Now this will work!
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -22,28 +23,41 @@ export function ProfilePictureUpload({ user }: ProfilePictureUploadProps) {
         ? `http://localhost:8080${user.profilePictureUrl}`
         : null;
 
-    // Upload mutation
+// Upload mutation
     const uploadMutation = useMutation({
         mutationFn: (file: File) => userService.uploadProfilePicture(file),
-        onSuccess: () => {
-            toast.success('Profile picture updated!');
-            queryClient.invalidateQueries({ queryKey: ['user'] });
+        onSuccess: (updatedUser) => {
+            // Update user in auth store - this is enough!
+            setUser(updatedUser);
+
+            // Clear preview
             setPreview(null);
+
+            // Show success message
+            toast.success('Profile picture updated!');
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to upload picture');
+        onError: (error: unknown) => {
+            console.error('Upload error:', error);
+            const err = error as { response?: { data?: { message?: string } } };
+            toast.error(err.response?.data?.message || 'Failed to upload picture');
+            setPreview(null);
         },
     });
 
-    // Delete mutation
+// Delete mutation
     const deleteMutation = useMutation({
         mutationFn: () => userService.deleteProfilePicture(),
-        onSuccess: () => {
+        onSuccess: (updatedUser) => {
+            // Update user in auth store
+            setUser(updatedUser);
+
+            // Show success message
             toast.success('Profile picture removed!');
-            queryClient.invalidateQueries({ queryKey: ['user'] });
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to delete picture');
+        onError: (error: unknown) => {
+            console.error('Delete error:', error);
+            const err = error as { response?: { data?: { message?: string } } };
+            toast.error(err.response?.data?.message || 'Failed to delete picture');
         },
     });
 
@@ -72,6 +86,9 @@ export function ProfilePictureUpload({ user }: ProfilePictureUploadProps) {
 
         // Upload file
         uploadMutation.mutate(file);
+
+        // Reset input
+        event.target.value = '';
     };
 
     const handleDelete = () => {

@@ -80,7 +80,7 @@ export default function RegisterPage() {
 
     // Extract error message
     const errorMessage = registerError
-        ? (registerError as any).response?.data?.message || 'Registration failed. Please try again.'
+        ? (registerError as { response?: { data?: { message?: string } } }).response?.data?.message || 'Registration failed. Please try again.'
         : null;
 
     return (

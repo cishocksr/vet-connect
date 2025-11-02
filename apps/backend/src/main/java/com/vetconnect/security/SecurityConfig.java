@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,102 +17,55 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Spring Security Configuration
  *
- * CONFIGURES:
- * - JWT authentication filter
- * - CORS (Cross-Origin Resource Sharing)
- * - CSRF protection (disabled for REST APIs)
- * - Session management (stateless for JWT)
- * - Public vs protected endpoints
+ * Configures:
+ * - JWT-based authentication
+ * - Public and protected endpoints
+ * - CORS settings
  * - Password encoding
- * - Authentication provider
- *
- * SECURITY MODEL:
- * - Stateless authentication (no server-side sessions)
- * - JWT tokens for authentication
- * - BCrypt password hashing
- * - CORS enabled for frontend access
  */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity  // Enables @PreAuthorize, @Secured annotations
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
-     * Configure HTTP security
-     *
-     * This is the main security configuration method
+     * Main security filter chain
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // ========== CORS CONFIGURATION ==========
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // ========== CSRF PROTECTION ==========
-                // Disabled because we're using JWT (not cookies)
-                // JWT tokens in Authorization header are not vulnerable to CSRF
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // ========== SESSION MANAGEMENT ==========
-                // Stateless - no server-side sessions
-                // Each request must include JWT token
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
-                // ========== AUTHORIZATION RULES ==========
+                .cors(cors -> {}) // Uses the WebConfig CORS configuration
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC ENDPOINTS (no authentication required)
-
-                        // Authentication endpoints (public except /me)
-                        .requestMatchers("/api/auth/register").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/refresh").permitAll()
-
-                        // Current user endpoint (requires authentication)
-                        .requestMatchers("/api/auth/me").authenticated()
-
-                        // Swagger/OpenAPI documentation
+                        // Public endpoints
                         .requestMatchers(
+                                "/api/auth/**",
                                 "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // ... rest of your configuration
+                        // Public resource endpoints
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/resources/**",
+                                "/api/categories/**"
+                        ).permitAll()
 
-                        // Health check endpoints
-                        .requestMatchers("/actuator/health").permitAll()
+                        // Static file serving (uploaded images)
+                        .requestMatchers("/uploads/**").permitAll()
 
-                        // Public resource browsing (GET only)
-                        .requestMatchers(HttpMethod.GET, "/api/resources/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
-
-                        // PROTECTED ENDPOINTS (authentication required)
-
-                        // User profile management
+                        // Protected endpoints - require authentication
                         .requestMatchers("/api/users/**").authenticated()
-
-                        // Saved resources (must be logged in)
                         .requestMatchers("/api/saved/**").authenticated()
-
-                        // Resource creation/modification (authenticated users only)
-                        // In production, you might want to restrict this to ADMIN role
                         .requestMatchers(HttpMethod.POST, "/api/resources/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/resources/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/resources/**").authenticated()
@@ -119,93 +73,20 @@ public class SecurityConfig {
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
-
-                // ========== JWT FILTER ==========
-                // Add our JWT filter before Spring Security's authentication filter
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     /**
-     * CORS configuration
-     *
-     * Allows frontend (running on different port/domain) to access API
-     *
-     * DEVELOPMENT:
-     * - Allow localhost:5173 (Vite dev server)
-     * - Allow localhost:3000 (React dev server)
-     *
-     * PRODUCTION:
-     * - Configure actual frontend domain
+     * Authentication provider using custom UserDetailsService
      */
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        // Allowed origins (frontend URLs)
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",  // Vite
-                "http://localhost:3000",  // React/Next.js
-                "http://localhost:3001"   // Docs app
-                // TODO: Add production domain
-        ));
-
-        // Allowed HTTP methods
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
-        ));
-
-        // Allowed headers
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "Origin",
-                "X-Requested-With"
-        ));
-
-        // Expose headers (headers that frontend can read)
-        configuration.setExposedHeaders(List.of("Authorization"));
-
-        // Allow credentials (cookies, authorization headers)
-        configuration.setAllowCredentials(true);
-
-        // Max age of pre-flight requests (in seconds)
-        configuration.setMaxAge(3600L);
-
-        // Apply CORS configuration to all endpoints
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
-    }
-
-    /**
-     * Password encoder bean
-     *
-     * Uses BCrypt hashing algorithm
-     * - Automatically generates salt
-     * - Adjustable strength (default: 10 rounds)
-     * - Industry standard for password hashing
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    /**
-     * Authentication provider
-     *
-     * Configures how Spring Security authenticates users
-     * - Uses our CustomUserDetailsService to load users
-     * - Uses BCrypt to verify passwords
-     */
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -213,13 +94,19 @@ public class SecurityConfig {
     }
 
     /**
-     * Authentication manager bean
-     *
-     * Required for manual authentication in AuthService
+     * Authentication manager
      */
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    /**
+     * Password encoder (BCrypt)
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

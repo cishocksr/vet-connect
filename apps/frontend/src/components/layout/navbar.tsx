@@ -84,7 +84,7 @@ export function Navbar() {
                                         <Avatar>
                                             {user.profilePictureUrl && (
                                                 <AvatarImage
-                                                    src={user.profilePictureUrl}
+                                                    src={`http://localhost:8080${user.profilePictureUrl}`}
                                                     alt={user.fullName}
                                                 />
                                             )}
