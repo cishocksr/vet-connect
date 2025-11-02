@@ -12,6 +12,7 @@ import ResourcesPage from './pages/resources-page.tsx';
 import ResourceDetailPage from './pages/resource-detail-page.tsx';
 import DashboardPage from './pages/dashboard.tsx';
 import ProfilePage from './pages/profile.tsx';
+import ProfileEditPage from "@/pages/profile-edit-page.tsx";
 
 function App() {
     return (
@@ -26,6 +27,8 @@ function App() {
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/resources" element={<ResourcesPage />} />
                     <Route path="/resources/:id" element={<ResourceDetailPage />} />
+                    <Route path="/profile/edit" element={<ProtectedRoute><ProfileEditPage /></ProtectedRoute>} />
+
 
                     {/* Protected Routes */}
                     <Route

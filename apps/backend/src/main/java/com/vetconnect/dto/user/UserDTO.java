@@ -96,6 +96,8 @@ public class UserDTO {
      */
     private boolean isHomeless;
 
+    private String profilePictureUrl;
+
     /**
      * Convenience field: Does the user have a complete address?
      * Useful for frontend validation and display logic

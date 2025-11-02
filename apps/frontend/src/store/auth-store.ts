@@ -1,72 +1,26 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { User } from '../types';
 
 interface AuthState {
     user: User | null;
-    token: string | null;
-    refreshToken: string | null;
     isAuthenticated: boolean;
-
-    // Actions
-    setAuth: (user: User, token: string, refreshToken: string) => void;
-    updateUser: (user: User) => void;
-    logout: () => void;
+    setUser: (user: User, token: string) => void;
+    clearUser: () => void;
 }
 
-/**
- * Authentication Store
- *
- * Manages user authentication state
- * Persists to localStorage automatically
- */
-export const useAuthStore = create<AuthState>()(
-    persist(
-        (set) => ({
-            user: null,
-            token: null,
-            refreshToken: null,
-            isAuthenticated: false,
+export const useAuthStore = create<AuthState>((set) => ({
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
+    isAuthenticated: !!localStorage.getItem('token'),
 
-            setAuth: (user, token, refreshToken) => {
-                // Store tokens in localStorage for API interceptor
-                localStorage.setItem('token', token);
-                localStorage.setItem('refreshToken', refreshToken);
+    setUser: (user: User, token: string) => {
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('token', token);
+        set({ user, isAuthenticated: true });
+    },
 
-                set({
-                    user,
-                    token,
-                    refreshToken,
-                    isAuthenticated: true,
-                });
-            },
-
-            updateUser: (user) => {
-                set({ user });
-            },
-
-            logout: () => {
-                // Clear localStorage
-                localStorage.removeItem('token');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('user');
-
-                set({
-                    user: null,
-                    token: null,
-                    refreshToken: null,
-                    isAuthenticated: false,
-                });
-            },
-        }),
-        {
-            name: 'auth-storage', // localStorage key
-            partialize: (state) => ({
-                user: state.user,
-                token: state.token,
-                refreshToken: state.refreshToken,
-                isAuthenticated: state.isAuthenticated,
-            }),
-        }
-    )
-);
+    clearUser: () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        set({ user: null, isAuthenticated: false });
+    },
+}));

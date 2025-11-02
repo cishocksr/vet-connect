@@ -1,65 +1,43 @@
 import { useAuthStore } from '../store/auth-store';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import authService from '../services/auth-service';
-import type { LoginRequest, RegisterRequest } from '@/types';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/auth-service';
+import type { LoginRequest, RegisterRequest, User } from '../types';
 
-/**
- * Custom hook for authentication
- *
- * Provides login, register, logout functionality
- * and auth state
- */
 export function useAuth() {
+    const { user, isAuthenticated, setUser, clearUser } = useAuthStore();
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
-    const { user, isAuthenticated, setAuth, logout: clearAuth } = useAuthStore();
 
-    // Login mutation
-    const loginMutation = useMutation({
-        mutationFn: (data: LoginRequest) => authService.login(data),
-        onSuccess: (response) => {
-            setAuth(response.user, response.token, response.refreshToken);
-            queryClient.invalidateQueries({ queryKey: ['user'] });
-            navigate('/');
-        },
-    });
+    const login = async (credentials: LoginRequest) => {
+        const response = await authService.login(credentials);
+        setUser(response.user, response.token);
+        navigate('/dashboard');
+    };
 
-    // Register mutation
-    const registerMutation = useMutation({
-        mutationFn: (data: RegisterRequest) => authService.register(data),
-        onSuccess: (response) => {
-            setAuth(response.user, response.token, response.refreshToken);
-            queryClient.invalidateQueries({ queryKey: ['user'] });
-            navigate('/');
-        },
-    });
+    const register = async (data: RegisterRequest) => {
+        const response = await authService.register(data);
+        setUser(response.user, response.token);
+        navigate('/dashboard');
+    };
 
-    // Get current user query
-    const { data: currentUser, isLoading: isLoadingUser } = useQuery({
-        queryKey: ['user', 'me'],
-        queryFn: () => authService.getCurrentUser(),
-        enabled: isAuthenticated,
-        staleTime: 5 * 60 * 1000, // 5 minutes
-    });
-
-    // Logout function
     const logout = () => {
-        clearAuth();
-        queryClient.clear();
+        clearUser();
         navigate('/login');
     };
 
+    // Add updateUser function for profile updates
+    const updateUser = (updatedUser: User) => {
+        const currentToken = localStorage.getItem('token');
+        if (currentToken) {
+            setUser(updatedUser, currentToken);
+        }
+    };
+
     return {
-        user: currentUser || user,
+        user,
         isAuthenticated,
-        isLoadingUser,
-        login: loginMutation.mutate,
-        register: registerMutation.mutate,
+        login,
+        register,
         logout,
-        isLoggingIn: loginMutation.isPending,
-        isRegistering: registerMutation.isPending,
-        loginError: loginMutation.error,
-        registerError: registerMutation.error,
+        setUser: updateUser, // Expose as setUser
     };
 }
