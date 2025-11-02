@@ -13,21 +13,23 @@ import type { LoginRequest } from '@/types';
 
 // Login form validation schema
 const loginSchema = z.object({
-    email: z.string().email('Invalid email address'),
+    email: z.string().email({ message: 'Invalid email address' }),
     password: z.string().min(1, 'Password is required'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-    const { login, isLoggingIn, loginError } = useAuth();
+    const { login } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     // Get the page they were trying to access (if redirected from protected route)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const from = (location.state as any)?.from?.pathname || '/';
+    const from = (location.state as any)?.from?.pathname || '/dashboard';
 
     const {
         register,
@@ -37,20 +39,25 @@ export default function LoginPage() {
         resolver: zodResolver(loginSchema),
     });
 
-    const onSubmit = (data: LoginFormData) => {
-        login(data as LoginRequest, {
-            onSuccess: () => {
-                // Redirect to the page they were trying to access
-                navigate(from, { replace: true });
-            },
-        });
-    };
+    const onSubmit = async (data: LoginFormData) => {
+        setIsLoggingIn(true);
+        setErrorMessage(null);
 
-    // Extract error message
-    const errorMessage = loginError
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ? (loginError as any).response?.data?.message || 'Login failed. Please try again.'
-        : null;
+        try {
+            await login(data as LoginRequest);
+            // The login function in useAuth already navigates to /dashboard
+            // But if they came from a specific page, navigate there instead
+            if (from !== '/dashboard') {
+                navigate(from, { replace: true });
+            }
+        } catch (error) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const message = (error as any)?.response?.data?.message || 'Login failed. Please try again.';
+            setErrorMessage(message);
+        } finally {
+            setIsLoggingIn(false);
+        }
+    };
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-primary-50 to-military-green/10 px-4 py-12">
