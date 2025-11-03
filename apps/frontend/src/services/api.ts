@@ -1,27 +1,19 @@
-import axios, { AxiosError } from 'axios';
-import type { InternalAxiosRequestConfig } from 'axios';
-import type { AuthResponse } from '../types';
+import axios from 'axios';
 
-// Base API URL - change this for production
-const API_BASE_URL = 'http://localhost:8080/api';
-
-// Create axios instance
 const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Request interceptor - Add JWT token to requests
+// Request interceptor for JWT token
 api.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
+    (config) => {
         const token = localStorage.getItem('token');
-
-        if (token && config.headers) {
+        if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-
         return config;
     },
     (error) => {
@@ -29,45 +21,35 @@ api.interceptors.request.use(
     }
 );
 
-// Response interceptor - Handle token refresh
+// Response interceptor for error handling
 api.interceptors.response.use(
     (response) => response,
-    async (error: AxiosError) => {
-        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    async (error) => {
+        const originalRequest = error.config;
 
-        // If 401 and we haven't retried yet, try to refresh token
+        // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
-            const refreshToken = localStorage.getItem('refreshToken');
-
-            if (refreshToken) {
-                try {
-                    const response = await axios.post<AuthResponse>(
-                        `${API_BASE_URL}/auth/refresh`,
+            try {
+                const refreshToken = localStorage.getItem('refreshToken');
+                if (refreshToken) {
+                    const response = await axios.post(
+                        `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
                         { refreshToken }
                     );
 
-                    const { token, refreshToken: newRefreshToken } = response.data;
-
-                    // Update tokens
+                    const { token } = response.data.data;
                     localStorage.setItem('token', token);
-                    localStorage.setItem('refreshToken', newRefreshToken);
 
-                    // Retry original request with new token
-                    if (originalRequest.headers) {
-                        originalRequest.headers.Authorization = `Bearer ${token}`;
-                    }
-
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
                     return api(originalRequest);
-                } catch (refreshError) {
-                    // Refresh failed - logout user
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('refreshToken');
-                    localStorage.removeItem('user');
-                    window.location.href = '/login';
-                    return Promise.reject(refreshError);
                 }
+            } catch (refreshError) {
+                // Refresh failed, redirect to login
+                localStorage.clear();
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
             }
         }
 

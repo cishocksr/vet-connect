@@ -15,7 +15,6 @@ import {
     Brain,
     Heart,
     ArrowRight,
-    Search,
     Target,
     Users,
     Award,
@@ -110,10 +109,9 @@ export default function HomePage() {
                                     <Button
                                         asChild
                                         size="lg"
-                                        className="bg-military-gold hover:bg-military-army-gold text-military-navy font-semibold shadow-lg hover:shadow-xl transition-all"
+                                        className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-military-navy font-semibold !text-white shadow-lg"
                                     >
                                         <Link to="/resources">
-                                            <Search className="mr-2 h-5 w-5" />
                                             Browse Resources
                                         </Link>
                                     </Button>
@@ -150,8 +148,7 @@ export default function HomePage() {
                                 <Button
                                     asChild
                                     size="lg"
-                                    variant="outline"
-                                    className="border-2 border-white text-white hover:bg-white hover:text-military-navy font-semibold"
+                                    className="border-2 border-white bg-transparent !text-white hover:bg-white hover:!text-military-navy font-semibold shadow-lg"
                                 >
                                     <Link to="/resources">
                                         Browse Resources

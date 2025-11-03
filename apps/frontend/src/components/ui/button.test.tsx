@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '../../__test__/utils';
+import { render, screen, fireEvent } from '../../__test__/utils.tsx';
 import { Button } from './button';
 
 describe('Button', () => {

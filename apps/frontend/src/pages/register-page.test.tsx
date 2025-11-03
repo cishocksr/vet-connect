@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '../__test__/utils';
+import { render, screen, fireEvent, waitFor } from '../__test__/utils.tsx';
 import RegisterPage from './register-page';
 import authService from '../services/auth-service';
 import { useAuthStore } from '../store/auth-store';

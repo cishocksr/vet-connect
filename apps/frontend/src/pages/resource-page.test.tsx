@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '../__test__/utils';
+import { render, screen, fireEvent, waitFor } from '../__test__/utils.tsx';
 import ResourcesPage from './resources-page';
 import resourceService from '../services/resource-service';
 import type { ResourceSummary, ResourceCategory, PageResponse } from '../types';

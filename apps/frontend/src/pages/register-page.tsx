@@ -9,7 +9,7 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { useAuth } from '@/hooks/use-auth.ts';
-import { Shield, AlertCircle, Loader2 } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import type { RegisterRequest, BranchOfService } from '@/types';
 
 // Register form validation schema
@@ -53,7 +53,7 @@ const US_STATES = [
 ];
 
 export default function RegisterPage() {
-    const { register: registerUser, isRegistering, registerError } = useAuth();
+    const { register: registerUser } = useAuth();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -70,19 +70,18 @@ export default function RegisterPage() {
         },
     });
 
-    const onSubmit = (data: RegisterFormData) => {
-        registerUser(data as RegisterRequest, {
-            onSuccess: () => {
-                navigate('/');
-            },
-        });
+    const onSubmit = async (data: RegisterFormData) => {
+        try {
+            await registerUser(data as RegisterRequest, {
+                onSuccess: () => {
+                    navigate('/');
+                },
+            });
+        } catch (error) {
+            // Error is handled by the auth store/service
+            console.error('Registration failed:', error);
+        }
     };
-
-    // Extract error message
-    const errorMessage = registerError
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ? (registerError as any).response?.data?.message || 'Registration failed. Please try again.'
-        : null;
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-primary-50 to-military-green/10 px-4 py-12">
@@ -100,14 +99,6 @@ export default function RegisterPage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        {/* Error Alert */}
-                        {errorMessage && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-800">
-                                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                                <span>{errorMessage}</span>
-                            </div>
-                        )}
-
                         {/* Name Fields */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -282,16 +273,8 @@ export default function RegisterPage() {
                         <Button
                             type="submit"
                             className="w-full bg-military-navy hover:bg-military-navy/90"
-                            disabled={isRegistering}
                         >
-                            {isRegistering ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Creating account...
-                                </>
-                            ) : (
-                                'Create Account'
-                            )}
+                            Create Account
                         </Button>
 
                         {/* Login Link */}

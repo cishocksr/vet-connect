@@ -29,7 +29,7 @@ export function useAuth() {
         navigate('/dashboard');
     };
 
-    const register = async (data: RegisterRequest) => {
+    const register = async (data: RegisterRequest, options?: { onSuccess?: () => void }) => {
         const response = await authService.register(data);
         setUser(response.user, response.token);
 
@@ -38,7 +38,11 @@ export function useAuth() {
             setThemeByBranch(response.user.branchOfService);
         }
 
-        navigate('/dashboard');
+        if (options?.onSuccess) {
+            options.onSuccess();
+        } else {
+            navigate('/dashboard');
+        }
     };
 
     const logout = () => {

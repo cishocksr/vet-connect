@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '../../__test__/utils';
+import { render, screen } from '../../__test__/utils.tsx';
 import { ProtectedRoute } from './protected-route';
 import { useAuthStore } from '../../store/auth-store';
 import type { User } from '../../types';

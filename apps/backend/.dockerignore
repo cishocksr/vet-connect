@@ -1,0 +1,35 @@
+# Build artifacts
+target/
+*.class
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Uploads (will be created at runtime)
+uploads/
+
+# Git
+.git/
+.gitignore
+
+# Maven wrapper jar (we copy it explicitly)
+!.mvn/wrapper/maven-wrapper.jar
+
+# Test files
+src/test/
+
+# Environment files
+.env
+.env.local

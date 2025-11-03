@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '../../__test__/utils';
+import { render, screen } from '../../__test__/utils.tsx';
 import { Footer } from './footer';
 
 describe('Footer', () => {

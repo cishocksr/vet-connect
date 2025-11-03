@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '../__test__/utils';
+import { render, screen, waitFor } from '../__test__/utils.tsx';
 import DashboardPage from './dashboard';
 import { useAuthStore } from '../store/auth-store';
 import savedResourceService from '../services/saved-resource-service';
