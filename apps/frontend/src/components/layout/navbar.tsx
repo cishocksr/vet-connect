@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import {Avatar, AvatarFallback, AvatarImage} from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { getInitials } from '@/lib/utils';
 import {
@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 export function Navbar() {
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, isAdmin, logout } = useAuth();
     const navigate = useNavigate();
 
     return (
@@ -44,8 +44,8 @@ export function Navbar() {
                             <Shield className="h-7 w-7 text-military-gold" />
                         </motion.div>
                         <span className="font-bold text-xl text-white group-hover:text-military-gold transition-colors">
-              VetConnect
-            </span>
+                            VetConnect
+                        </span>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -71,6 +71,16 @@ export function Navbar() {
                             >
                                 <BookmarkCheck className="h-4 w-4" />
                                 Dashboard
+                            </Link>
+                        )}
+                        {/* ADMIN LINK - Desktop */}
+                        {isAdmin && (
+                            <Link
+                                to="/admin"
+                                className="flex items-center gap-2 text-sm font-medium text-white hover:text-military-gold transition-colors"
+                            >
+                                <Shield className="h-4 w-4" />
+                                Admin
                             </Link>
                         )}
                     </div>
@@ -116,8 +126,18 @@ export function Navbar() {
                                         <User className="mr-2 h-4 w-4" />
                                         Profile
                                     </DropdownMenuItem>
+                                    {/* ADMIN LINK - User Dropdown */}
+                                    {isAdmin && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => navigate('/admin')}>
+                                                <Shield className="mr-2 h-4 w-4 text-military-gold" />
+                                                <span className="font-semibold">Admin Dashboard</span>
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={logout} variant="destructive">
+                                    <DropdownMenuItem onClick={logout} className="text-red-600">
                                         <LogOut className="mr-2 h-4 w-4" />
                                         Logout
                                     </DropdownMenuItem>
@@ -162,6 +182,16 @@ export function Navbar() {
                                         <BookmarkCheck className="mr-2 h-4 w-4" />
                                         Dashboard
                                     </DropdownMenuItem>
+                                )}
+                                {/* ADMIN LINK - Mobile Menu */}
+                                {isAdmin && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                                            <Shield className="mr-2 h-4 w-4 text-military-gold" />
+                                            <span className="font-semibold">Admin</span>
+                                        </DropdownMenuItem>
+                                    </>
                                 )}
                             </DropdownMenuContent>
                         </DropdownMenu>

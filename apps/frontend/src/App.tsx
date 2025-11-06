@@ -3,6 +3,7 @@ import { Navbar } from './components/layout/navbar.tsx';
 import { Footer } from './components/layout/footer.tsx';
 import { ProtectedRoute } from './components/auth/protected-route.tsx';
 import { ScrollToTop } from './components/layout/scroll-to-top.tsx';
+import {Toaster} from "./components/ui/sonner.tsx";
 
 // Pages (we'll create these next)
 import HomePage from './pages/home-page';
@@ -13,6 +14,10 @@ import ResourceDetailPage from './pages/resource-detail-page.tsx';
 import DashboardPage from './pages/dashboard.tsx';
 import ProfilePage from './pages/profile.tsx';
 import ProfileEditPage from "@/pages/profile-edit-page.tsx";
+import AdminDashboard from "@/pages/admin/admin-dashboard.tsx";
+import {AdminRoute} from "@/components/auth/admin-route.tsx";
+import AdminUsers from "@/pages/admin/admin-users.tsx";
+import AdminUserDetail from "@/pages/admin/admin-user-detail.tsx";
 
 function App() {
     return (
@@ -28,6 +33,7 @@ function App() {
                     <Route path="/resources" element={<ResourcesPage />} />
                     <Route path="/resources/:id" element={<ResourceDetailPage />} />
                     <Route path="/profile/edit" element={<ProtectedRoute><ProfileEditPage /></ProtectedRoute>} />
+
 
 
                     {/* Protected Routes */}
@@ -47,9 +53,35 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
+                    {/* Admin Routes */}
+                    <Route
+                        path="/admin"
+                        element={
+                            <AdminRoute>
+                                <AdminDashboard />
+                            </AdminRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/users"
+                        element={
+                            <AdminRoute>
+                                <AdminUsers />
+                            </AdminRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/users/:userId"
+                        element={
+                            <AdminRoute>
+                                <AdminUserDetail />
+                            </AdminRoute>
+                        }
+                    />
                 </Routes>
             </main>
             <Footer />
+            <Toaster />
         </div>
     );
 }

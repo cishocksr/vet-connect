@@ -1,6 +1,7 @@
 package com.vetconnect.model;
 
 import com.vetconnect.model.enums.BranchOfService;
+import com.vetconnect.model.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -36,7 +37,7 @@ public class User {
     private String passwordHash;
 
     @NotBlank(message = "First name is required")
-    @Size(max =  100, message = "Last name must be less than 100 characters")
+    @Size(max = 100, message = "First name must be less than 100 characters")
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
@@ -50,21 +51,20 @@ public class User {
     @Column(name = "branch_of_service", nullable = false, length = 50)
     private BranchOfService branchOfService;
 
-
     @Size(max = 255, message = "Address line 1 must be less than 255 characters")
-    @Column(name = "address_line1", length =255)
+    @Column(name = "address_line1", length = 255)
     private String addressLine1;
 
     @Size(max = 255, message = "Address line 2 must be less than 255 characters")
     @Column(name = "address_line2", length = 255)
     private String addressLine2;
 
-    @Size(max = 100, message = "City must be less than 100 chatacters")
+    @Size(max = 100, message = "City must be less than 100 characters")
     @Column(name = "city", length = 100)
     private String city;
 
-    @Size(min = 2, max = 2, message = "State must be exactly 2 chatacters")
-    @Column(name="state", length = 2)
+    @Size(min = 2, max = 2, message = "State must be exactly 2 characters")
+    @Column(name = "state", length = 2)
     private String state;
 
     @Size(max = 10, message = "Zip code must be less than 10 characters")
@@ -78,6 +78,25 @@ public class User {
     @Size(max = 500, message = "Profile picture URL must be less than 500 characters")
     @Column(name = "profile_picture_url", length = 500)
     private String profilePictureUrl;
+
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private boolean isActive = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    @Builder.Default
+    private UserRole role = UserRole.USER;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    @Column(name = "suspended_at")
+    private LocalDateTime suspendedAt;
+
+    @Size(max = 500, message = "Suspended reason must be less than 500 characters")
+    @Column(name = "suspended_reason", length = 500)
+    private String suspendedReason;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -97,9 +116,4 @@ public class User {
                 && state != null && !state.isBlank()
                 && zipCode != null && !zipCode.isBlank();
     }
-
-
-
-
-
 }

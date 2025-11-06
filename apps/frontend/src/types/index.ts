@@ -14,7 +14,8 @@ export interface User {
     state?: string;
     zipCode?: string;
     isHomeless: boolean;
-    profilePictureUrl?: string;  // ADD THIS
+    profilePictureUrl?: string;
+    role: string;
     createdAt: string;
     updatedAt: string;
 }

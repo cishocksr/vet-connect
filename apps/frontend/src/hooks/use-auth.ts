@@ -1,12 +1,23 @@
 import { useAuthStore } from '../store/auth-store';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react'; // ADD THIS
+import { useEffect } from 'react';
 import authService from '../services/auth-service';
 import type { LoginRequest, RegisterRequest, User } from '../types';
 import { useTheme } from "@/contexts/theme-context";
 
-export function useAuth() {
-    const { user, isAuthenticated, setUser, clearUser } = useAuthStore();
+// ADD THIS: Define the return type interface
+interface UseAuthReturn {
+    user: User | null;
+    isAuthenticated: boolean;
+    isAdmin: boolean;
+    login: (credentials: LoginRequest) => Promise<void>;
+    register: (data: RegisterRequest, options?: { onSuccess?: () => void }) => Promise<void>;
+    logout: () => void;
+    setUser: (updatedUser: User) => void;
+}
+
+export function useAuth(): UseAuthReturn {  // ADD RETURN TYPE HERE
+    const { user, isAuthenticated, isAdmin, setUser, clearUser } = useAuthStore();
     const { setThemeByBranch, resetTheme } = useTheme();
     const navigate = useNavigate();
 
@@ -67,6 +78,7 @@ export function useAuth() {
     return {
         user,
         isAuthenticated,
+        isAdmin,
         login,
         register,
         logout,

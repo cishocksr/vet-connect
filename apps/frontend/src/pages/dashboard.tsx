@@ -118,7 +118,7 @@ export default function DashboardPage() {
                             <BookmarkCheck className="h-6 w-6" />
                             Your Saved Resources
                         </h2>
-                        <Button asChild variant="outline">
+                        <Button asChild variant="outline" className="text-gray-700 hover:text-gray-900">
                             <Link to="/resources">
                                 <Search className="h-4 w-4 mr-2" />
                                 Browse More
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                                                             />
                                                             <Button
                                                                 onClick={() => handleUpdateNotes(saved.id)}
-                                                                className="w-full"
+                                                                className="w-full bg-military-navy hover:bg-military-navy/90 text-white"
                                                                 disabled={updateNotesMutation.isPending}
                                                             >
                                                                 {updateNotesMutation.isPending ? (
@@ -245,6 +245,7 @@ export default function DashboardPage() {
                                                             <Button
                                                                 variant="outline"
                                                                 onClick={() => setDeleteId(null)}
+                                                                className="text-gray-700 hover:text-gray-900"
                                                             >
                                                                 Cancel
                                                             </Button>
@@ -252,6 +253,7 @@ export default function DashboardPage() {
                                                                 variant="destructive"
                                                                 onClick={() => handleDelete(saved.id)}
                                                                 disabled={deleteMutation.isPending}
+                                                                className="text-white"
                                                             >
                                                                 {deleteMutation.isPending ? (
                                                                     <>
@@ -331,12 +333,12 @@ export default function DashboardPage() {
                         <p className="text-gray-600 mb-4">
                         Start exploring and save resources to your dashboard for quick access
                         </p>
-                        <Button asChild className="bg-military-navy">
-                        <Link to="/resources">
-                        <Search className="h-4 w-4 mr-2" />
-                        Browse Resources
-                        </Link>
-                        </Button>
+                            <Button asChild className="bg-military-navy hover:bg-military-navy/90 text-white">
+                                <Link to="/resources">
+                                    <Search className="h-4 w-4 mr-2" />
+                                    Browse Resources
+                                </Link>
+                            </Button>
                         </CardContent>
                         </Card>
                         )}

@@ -13,4 +13,5 @@
     <include file="changes/005-insert-initial-categories.xml" relativeToChangelogFile="true"/>
     <include file="changes/006-insert-sample-resources.xml" relativeToChangelogFile="true"/>
     <include file="changes/007-add-profile-picture-to-users.xml" relativeToChangelogFile="true"/>
+    <include file="db/changelog/changes/008-add-user-status-fields.xml"/>
 </databaseChangeLog>

@@ -55,9 +55,6 @@ jobs:
       - name: Install pnpm
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@v4
-        with:
-          version: 8
-          run_install: false
 
       - name: Install frontend dependencies
         if: matrix.language == 'javascript'

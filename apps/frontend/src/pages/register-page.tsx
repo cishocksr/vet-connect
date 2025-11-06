@@ -27,7 +27,7 @@ const registerSchema = z.object({
     city: z.string().optional(),
     state: z.string().optional(),
     zipCode: z.string().optional(),
-    isHomeless: z.boolean(), // Changed from .default(false)
+    isHomeless: z.boolean(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ['confirmPassword'],
@@ -57,6 +57,8 @@ export default function RegisterPage() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     const {
         register,
@@ -72,14 +74,27 @@ export default function RegisterPage() {
 
     const onSubmit = async (data: RegisterFormData) => {
         try {
-            await registerUser(data as RegisterRequest, {
+            setIsSubmitting(true);
+            setErrorMessage('');
+
+            // Remove confirmPassword before sending to backend
+            const { confirmPassword, ...registerData } = data;
+
+            await registerUser(registerData as RegisterRequest, {
                 onSuccess: () => {
-                    navigate('/');
+                    navigate('/dashboard');
                 },
             });
-        } catch (error) {
-            // Error is handled by the auth store/service
+        } catch (error: any) {
             console.error('Registration failed:', error);
+
+            // Display error message to user
+            const message = error.response?.data?.message
+                || error.message
+                || 'Registration failed. Please try again.';
+            setErrorMessage(message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -99,6 +114,13 @@ export default function RegisterPage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        {/* Error Message Display */}
+                        {errorMessage && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                                <p className="text-sm text-red-600">{errorMessage}</p>
+                            </div>
+                        )}
+
                         {/* Name Fields */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -144,17 +166,24 @@ export default function RegisterPage() {
                         </div>
 
                         {/* Branch of Service */}
+                        {/* Branch of Service */}
                         <div className="space-y-2">
                             <Label htmlFor="branchOfService">Branch of Service *</Label>
                             <Select
                                 onValueChange={(value) => setValue('branchOfService', value)}
                             >
-                                <SelectTrigger className={errors.branchOfService ? 'border-red-500' : ''}>
+                                <SelectTrigger
+                                    className={`bg-white ${errors.branchOfService ? 'border-red-500' : ''}`}
+                                >
                                     <SelectValue placeholder="Select your branch" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white">
                                     {BRANCHES.map((branch) => (
-                                        <SelectItem key={branch.value} value={branch.value}>
+                                        <SelectItem
+                                            key={branch.value}
+                                            value={branch.value}
+                                            className="cursor-pointer"
+                                        >
                                             {branch.label}
                                         </SelectItem>
                                     ))}
@@ -269,12 +298,14 @@ export default function RegisterPage() {
                             </Label>
                         </div>
 
+
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full bg-military-navy hover:bg-military-navy/90"
+                            className="w-full bg-military-navy hover:bg-military-navy/90 text-white font-medium"
+                            disabled={isSubmitting}
                         >
-                            Create Account
+                            {isSubmitting ? 'Creating Account...' : 'Create Account'}
                         </Button>
 
                         {/* Login Link */}
