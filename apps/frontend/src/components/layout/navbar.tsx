@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { getInitials } from '@/lib/utils';
 import {
@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 export function Navbar() {
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, isAdmin, logout } = useAuth();
     const navigate = useNavigate();
 
     return (
@@ -44,8 +44,8 @@ export function Navbar() {
                             <Shield className="h-7 w-7 text-military-gold" />
                         </motion.div>
                         <span className="font-bold text-xl text-white group-hover:text-military-gold transition-colors">
-              VetConnect
-            </span>
+                            VetConnect
+                        </span>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -73,6 +73,16 @@ export function Navbar() {
                                 Dashboard
                             </Link>
                         )}
+                        {/* ADMIN LINK - Desktop */}
+                        {isAdmin && (
+                            <Link
+                                to="/admin"
+                                className="flex items-center gap-2 text-sm font-medium text-white hover:text-military-gold transition-colors"
+                            >
+                                <Shield className="h-4 w-4" />
+                                Admin
+                            </Link>
+                        )}
                     </div>
 
                     {/* Auth Buttons / User Menu */}
@@ -82,17 +92,26 @@ export function Navbar() {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-white/10">
                                         <Avatar>
+                                            {user.profilePictureUrl && (
+                                                <AvatarImage
+                                                    src={`http://localhost:8080${user.profilePictureUrl}`}
+                                                    alt={user.fullName}
+                                                />
+                                            )}
                                             <AvatarFallback className="bg-gradient-to-br from-military-gold to-military-army-gold text-military-navy font-bold">
                                                 {getInitials(user.firstName, user.lastName)}
                                             </AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="w-56 z-[100] bg-white dark:bg-gray-800 shadow-lg border border-gray-200"
+                                >
                                     <DropdownMenuLabel>
                                         <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium">{user.fullName}</p>
-                                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                                            <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
+                                            <p className="text-xs text-gray-500">{user.email}</p>
                                             <p className="text-xs text-military-green font-medium">
                                                 {user.branchDisplayName}
                                             </p>
@@ -107,6 +126,16 @@ export function Navbar() {
                                         <User className="mr-2 h-4 w-4" />
                                         Profile
                                     </DropdownMenuItem>
+                                    {/* ADMIN LINK - User Dropdown */}
+                                    {isAdmin && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => navigate('/admin')}>
+                                                <Shield className="mr-2 h-4 w-4 text-military-gold" />
+                                                <span className="font-semibold">Admin Dashboard</span>
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={logout} className="text-red-600">
                                         <LogOut className="mr-2 h-4 w-4" />
@@ -153,6 +182,16 @@ export function Navbar() {
                                         <BookmarkCheck className="mr-2 h-4 w-4" />
                                         Dashboard
                                     </DropdownMenuItem>
+                                )}
+                                {/* ADMIN LINK - Mobile Menu */}
+                                {isAdmin && (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                                            <Shield className="mr-2 h-4 w-4 text-military-gold" />
+                                            <span className="font-semibold">Admin</span>
+                                        </DropdownMenuItem>
+                                    </>
                                 )}
                             </DropdownMenuContent>
                         </DropdownMenu>

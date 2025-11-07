@@ -136,3 +136,21 @@
         animation: scale-in 0.3s ease-out;
     }
 }
+
+/* Fix for dropdown menu visibility */
+[data-radix-popper-content-wrapper] {
+    z-index: 100 !important;
+}
+
+/* Ensure dropdown content is visible */
+[data-slot="dropdown-menu-content"] {
+    background-color: white;
+    color: black;
+}
+
+@media (prefers-color-scheme: dark) {
+    [data-slot="dropdown-menu-content"] {
+        background-color: #1f2937;
+        color: white;
+    }
+}

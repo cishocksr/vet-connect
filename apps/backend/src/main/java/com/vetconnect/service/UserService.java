@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +44,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     // ========== READ OPERATIONS ==========
 
@@ -138,6 +141,60 @@ public class UserService {
         return users.stream()
                 .map(userMapper::toProfileDTO)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Update user profile picture
+     *
+     * @param userId User's UUID
+     * @param file Uploaded image file
+     * @return Updated UserDTO
+     */
+    @Transactional
+    public UserDTO updateProfilePicture(UUID userId, MultipartFile file) {
+        log.info("Updating profile picture for user: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Delete old profile picture if exists
+        if (user.getProfilePictureUrl() != null) {
+            fileStorageService.deleteProfilePicture(user.getProfilePictureUrl());
+        }
+
+        // Store new profile picture
+        String profilePictureUrl = fileStorageService.storeProfilePicture(file, userId);
+        user.setProfilePictureUrl(profilePictureUrl);
+
+        User updatedUser = userRepository.save(user);
+        log.info("Successfully updated profile picture for user: {}", userId);
+
+        return userMapper.toDTO(updatedUser);
+    }
+
+    /**
+     * Delete user profile picture
+     *
+     * @param userId User's UUID
+     * @return Updated UserDTO
+     */
+    @Transactional
+    public UserDTO deleteProfilePicture(UUID userId) {
+        log.info("Deleting profile picture for user: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Delete file
+        if (user.getProfilePictureUrl() != null) {
+            fileStorageService.deleteProfilePicture(user.getProfilePictureUrl());
+            user.setProfilePictureUrl(null);
+        }
+
+        User updatedUser = userRepository.save(user);
+        log.info("Successfully deleted profile picture for user: {}", userId);
+
+        return userMapper.toDTO(updatedUser);
     }
 
     /**

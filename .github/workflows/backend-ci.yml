@@ -41,13 +41,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          cache-dependency-path: 'apps/backend/pom.xml'
 
       - name: Run tests with Maven
         working-directory: ./apps/backend
@@ -70,7 +64,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: backend-test-results
           path: apps/backend/target/surefire-reports/
 
       - name: Archive coverage report
@@ -94,6 +88,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'apps/backend/pom.xml'
 
       - name: Build with Maven
         working-directory: ./apps/backend
@@ -120,6 +115,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'apps/backend/pom.xml'
 
       - name: Run OWASP Dependency Check
         working-directory: ./apps/backend
@@ -137,7 +133,7 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: [test, build]
-    if: github.ref == 'refs/heads/main' && secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != ''
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -147,6 +143,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
+        if: ${{ secrets.DOCKER_USERNAME != '' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -163,6 +160,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
+        if: ${{ secrets.DOCKER_USERNAME != '' }}
         uses: docker/build-push-action@v5
         with:
           context: ./apps/backend
@@ -188,6 +186,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'apps/backend/pom.xml'
 
       # Checkstyle disabled until google_checks.xml or custom config is added
       # - name: Run Checkstyle

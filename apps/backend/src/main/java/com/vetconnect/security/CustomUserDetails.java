@@ -38,10 +38,9 @@ public class CustomUserDetails implements UserDetails {
      * @return CustomUserDetails for Spring Security
      */
     public static CustomUserDetails create(User user) {
-        // For now, all users have USER role
-        // In future, you can add admin roles, etc.
+        // Create authorities based on user role
         Collection<GrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_USER")
+                new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
         );
 
         return new CustomUserDetails(
@@ -50,6 +49,17 @@ public class CustomUserDetails implements UserDetails {
                 user.getPasswordHash(),
                 authorities
         );
+    }
+
+    /**
+     * Helper method to check if user has a specific role
+     *
+     * @param role Role name (e.g., "ADMIN", "USER")
+     * @return true if user has the role
+     */
+    public boolean hasRole(String role) {
+        return authorities.stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role));
     }
 
     @Override

@@ -47,6 +47,7 @@ public class UserProfileDTO {
     private String fullName;
     private BranchOfService branchOfService;
     private String branchDisplayName;
+    private String profilePictureUrl;
 
     // Only show city/state for privacy (not full address)
     private String city;

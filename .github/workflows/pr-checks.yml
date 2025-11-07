@@ -54,6 +54,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'apps/backend/pom.xml'
 
       - name: Run tests with coverage
         working-directory: ./apps/backend
@@ -65,7 +66,8 @@ jobs:
           if [ -f target/site/jacoco/jacoco.csv ]; then
             COVERAGE=$(awk -F"," 'NR>1 { instructions += $4 + $5; covered += $5 } END { if (instructions > 0) print covered/instructions*100; else print 0 }' target/site/jacoco/jacoco.csv)
             echo "Coverage: $COVERAGE%"
-            if (( $(echo "$COVERAGE < 60" | bc -l) )); then
+            THRESHOLD=60
+            if awk -v cov="$COVERAGE" -v thr="$THRESHOLD" 'BEGIN { exit !(cov < thr) }'; then
               echo "::warning::Coverage ($COVERAGE%) is below threshold (60%)"
             fi
           else
@@ -94,6 +96,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          cache-dependency-path: 'apps/backend/pom.xml'
 
       - name: Verify build
         working-directory: ./apps/backend

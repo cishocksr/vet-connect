@@ -9,7 +9,7 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { useAuth } from '@/hooks/use-auth.ts';
-import { Shield, AlertCircle, Loader2 } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import type { RegisterRequest, BranchOfService } from '@/types';
 
 // Register form validation schema
@@ -27,7 +27,7 @@ const registerSchema = z.object({
     city: z.string().optional(),
     state: z.string().optional(),
     zipCode: z.string().optional(),
-    isHomeless: z.boolean(), // Changed from .default(false)
+    isHomeless: z.boolean(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ['confirmPassword'],
@@ -53,10 +53,12 @@ const US_STATES = [
 ];
 
 export default function RegisterPage() {
-    const { register: registerUser, isRegistering, registerError } = useAuth();
+    const { register: registerUser } = useAuth();
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     const {
         register,
@@ -70,18 +72,31 @@ export default function RegisterPage() {
         },
     });
 
-    const onSubmit = (data: RegisterFormData) => {
-        registerUser(data as RegisterRequest, {
-            onSuccess: () => {
-                navigate('/');
-            },
-        });
-    };
+    const onSubmit = async (data: RegisterFormData) => {
+        try {
+            setIsSubmitting(true);
+            setErrorMessage('');
 
-    // Extract error message
-    const errorMessage = registerError
-        ? (registerError as any).response?.data?.message || 'Registration failed. Please try again.'
-        : null;
+            // Remove confirmPassword before sending to backend
+            const { confirmPassword, ...registerData } = data;
+
+            await registerUser(registerData as RegisterRequest, {
+                onSuccess: () => {
+                    navigate('/dashboard');
+                },
+            });
+        } catch (error: any) {
+            console.error('Registration failed:', error);
+
+            // Display error message to user
+            const message = error.response?.data?.message
+                || error.message
+                || 'Registration failed. Please try again.';
+            setErrorMessage(message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-primary-50 to-military-green/10 px-4 py-12">
@@ -99,11 +114,10 @@ export default function RegisterPage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        {/* Error Alert */}
+                        {/* Error Message Display */}
                         {errorMessage && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-800">
-                                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                                <span>{errorMessage}</span>
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                                <p className="text-sm text-red-600">{errorMessage}</p>
                             </div>
                         )}
 
@@ -152,17 +166,24 @@ export default function RegisterPage() {
                         </div>
 
                         {/* Branch of Service */}
+                        {/* Branch of Service */}
                         <div className="space-y-2">
                             <Label htmlFor="branchOfService">Branch of Service *</Label>
                             <Select
                                 onValueChange={(value) => setValue('branchOfService', value)}
                             >
-                                <SelectTrigger className={errors.branchOfService ? 'border-red-500' : ''}>
+                                <SelectTrigger
+                                    className={`bg-white ${errors.branchOfService ? 'border-red-500' : ''}`}
+                                >
                                     <SelectValue placeholder="Select your branch" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white">
                                     {BRANCHES.map((branch) => (
-                                        <SelectItem key={branch.value} value={branch.value}>
+                                        <SelectItem
+                                            key={branch.value}
+                                            value={branch.value}
+                                            className="cursor-pointer"
+                                        >
                                             {branch.label}
                                         </SelectItem>
                                     ))}
@@ -277,20 +298,14 @@ export default function RegisterPage() {
                             </Label>
                         </div>
 
+
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full bg-military-navy hover:bg-military-navy/90"
-                            disabled={isRegistering}
+                            className="w-full bg-military-navy hover:bg-military-navy/90 text-white font-medium"
+                            disabled={isSubmitting}
                         >
-                            {isRegistering ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Creating account...
-                                </>
-                            ) : (
-                                'Create Account'
-                            )}
+                            {isSubmitting ? 'Creating Account...' : 'Create Account'}
                         </Button>
 
                         {/* Login Link */}

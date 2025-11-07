@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render } from './__test__/utils'
+import { render } from './__test__/utils.tsx'
 import App from './App'
 
 describe('App', () => {
