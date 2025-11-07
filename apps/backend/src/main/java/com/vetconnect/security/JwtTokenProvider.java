@@ -27,6 +27,7 @@ import java.util.UUID;
  * Payload contains:
  * - sub: User ID (UUID)
  * - email: User email
+ * - tokenVersion: Token version for bulk invalidation (SECURITY FEATURE)
  * - iat: Issued at timestamp
  * - exp: Expiration timestamp
  *
@@ -34,6 +35,7 @@ import java.util.UUID;
  * - Uses HS512 algorithm
  * - Secret key must be at least 256 bits (32 characters)
  * - Tokens are signed, not encrypted (don't put sensitive data!)
+ * - Token version enables instant invalidation of all user tokens
  */
 @Component
 @Slf4j
@@ -56,19 +58,29 @@ public class JwtTokenProvider {
      */
     public String generateToken(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return generateTokenFromUserId(userDetails.getId(), userDetails.getUsername());
+        return generateTokenFromUserId(
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getTokenVersion()
+        );
     }
 
     /**
-     * Generate JWT access token from user ID and email
+     * Generate JWT access token from user ID, email, and token version
      *
      * USE CASE: After registration, login
      *
+     * SECURITY: Token version included for bulk invalidation
+     * - When user changes password, increment tokenVersion
+     * - All old tokens become invalid instantly
+     * - No need to blacklist each token individually
+     *
      * @param userId User's UUID
      * @param email User's email
+     * @param tokenVersion User's current token version
      * @return JWT token string
      */
-    public String generateTokenFromUserId(UUID userId, String email) {
+    public String generateTokenFromUserId(UUID userId, String email, Integer tokenVersion) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
@@ -77,6 +89,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(userId.toString())  // User ID
                 .claim("email", email)       // User email
+                .claim("tokenVersion", tokenVersion)  // Token version for security
                 .issuedAt(now)              // When token was created
                 .expiration(expiryDate)     // When token expires
                 .signWith(key, Jwts.SIG.HS512)  // Sign with secret (UPDATED API)
@@ -144,12 +157,43 @@ public class JwtTokenProvider {
     }
 
     /**
+     * Extract token version from JWT token
+     *
+     * SECURITY FEATURE:
+     * - Each user has a token version number in database
+     * - JWT tokens include this version number
+     * - During validation, we compare token version with user's current version
+     * - If mismatch, token is invalid (even if not expired)
+     * - This enables instant invalidation of all user tokens by incrementing version
+     *
+     * USE CASES:
+     * - User changes password -> increment version -> all old tokens invalid
+     * - Account compromised -> increment version -> force re-login
+     * - Admin suspends user -> increment version -> immediate logout
+     *
+     * @param token JWT token string
+     * @return Token version
+     */
+    public Integer getTokenVersionFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("tokenVersion", Integer.class);
+    }
+
+    /**
      * Validate JWT token
      *
      * Checks:
      * - Signature is valid
      * - Token is not expired
      * - Token format is correct
+     *
+     * NOTE: This only validates the token structure and signature.
+     * Token version validation happens in JwtAuthenticationFilter.
      *
      * @param token JWT token string
      * @return true if valid, false otherwise
@@ -219,6 +263,9 @@ public class JwtTokenProvider {
 
     /**
      * Get time until token expires (in milliseconds)
+     *
+     * Used by token blacklist service to set TTL on blacklisted tokens
+     * No need to keep blacklisted tokens in Redis after they naturally expire
      *
      * @param token JWT token string
      * @return Milliseconds until expiration

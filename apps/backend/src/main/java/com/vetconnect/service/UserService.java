@@ -5,6 +5,8 @@ import com.vetconnect.dto.user.UpdatePasswordRequest;
 import com.vetconnect.dto.user.UpdateUserRequest;
 import com.vetconnect.dto.user.UserDTO;
 import com.vetconnect.dto.user.UserProfileDTO;
+import com.vetconnect.exception.InvalidCredentialsException;
+import com.vetconnect.exception.ResourceNotFoundException;
 import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
 import com.vetconnect.model.enums.BranchOfService;
@@ -373,6 +375,42 @@ public class UserService {
 
         userRepository.delete(user);
         log.info("Successfully deleted user: {}", userId);
+    }
+
+    /**
+     * Change user password and invalidate all tokens
+     *
+     * SECURITY:
+     * - Increments token version to invalidate all existing tokens
+     * - Forces user to re-login on all devices
+     * - Prevents compromised tokens from being used
+     *
+     * @param userId User ID
+     * @param currentPassword Current password for verification
+     * @param newPassword New password
+     */
+    @Transactional
+    public void changePassword(UUID userId, String currentPassword, String newPassword) {
+        log.debug("Password change request for user: {}", userId);
+
+        // Get user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Current password is incorrect");
+        }
+
+        // Update password
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+
+        // INCREMENT TOKEN VERSION - This invalidates all existing tokens!
+        user.incrementTokenVersion();
+
+        userRepository.save(user);
+
+        log.info("Password changed successfully for user: {}. All tokens invalidated.", userId);
     }
 
     // ========== HELPER METHODS ==========

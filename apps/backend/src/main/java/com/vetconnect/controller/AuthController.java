@@ -4,17 +4,17 @@ import com.vetconnect.dto.auth.AuthResponse;
 import com.vetconnect.dto.auth.LoginRequest;
 import com.vetconnect.dto.auth.RegisterRequest;
 import com.vetconnect.dto.common.ApiResponse;
-import com.vetconnect.dto.user.UserDTO;
-import com.vetconnect.security.CustomUserDetails;
+import com.vetconnect.exception.RateLimitException;
 import com.vetconnect.service.AuthService;
+import com.vetconnect.service.RateLimitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -23,206 +23,223 @@ import org.springframework.web.bind.annotation.*;
  * ENDPOINTS:
  * - POST /api/auth/register - Register new user
  * - POST /api/auth/login - Login user
+ * - POST /api/auth/logout - Logout user (invalidate token)
  * - POST /api/auth/refresh - Refresh access token
- * - POST /api/auth/logout - Logout user
  *
- * ALL ENDPOINTS ARE PUBLIC (no authentication required)
+ * SECURITY FEATURES:
+ * - Rate limiting on all endpoints
+ * - JWT token blacklist on logout
+ * - Password hashing with BCrypt
+ * - Input validation
  */
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Authentication", description = "User authentication and registration")
+@Tag(name = "Authentication", description = "User authentication endpoints")
 public class AuthController {
 
     private final AuthService authService;
+    private final RateLimitService rateLimitService;
 
     /**
-     * Register new user
-     *
+     * Register a new user
      * POST /api/auth/register
      *
-     * Request body:
-     * {
-     *   "email": "veteran@example.com",
-     *   "password": "SecurePassword123!",
-     *   "firstName": "John",
-     *   "lastName": "Doe",
-     *   "branchOfService": "ARMY",
-     *   "addressLine1": "123 Main St",
-     *   "city": "Ashburn",
-     *   "state": "VA",
-     *   "zipCode": "20147",
-     *   "isHomeless": false
-     * }
+     * SECURITY:
+     * - Rate limited to 3 attempts per minute per IP
+     * - Password must meet complexity requirements
+     * - Email must be unique
      *
-     * Response: 201 Created
-     * {
-     *   "success": true,
-     *   "message": "User registered successfully",
-     *   "data": {
-     *     "token": "eyJhbGciOiJIUzUxMiJ9...",
-     *     "refreshToken": "eyJhbGciOiJIUzUxMiJ9...",
-     *     "tokenType": "Bearer",
-     *     "expiresIn": 86400,
-     *     "user": { ...user details... }
-     *   }
-     * }
+     * @param request RegisterRequest containing user details
+     * @param httpRequest HTTP request to extract IP address
+     * @return AuthResponse with JWT tokens
      */
     @PostMapping("/register")
-    @Operation(summary = "Register new user", description = "Create a new user account")
+    @Operation(summary = "Register", description = "Register a new user account")
     public ResponseEntity<ApiResponse<AuthResponse>> register(
-            @Valid @RequestBody RegisterRequest registerRequest) {
+            @Valid @RequestBody RegisterRequest request,
+            HttpServletRequest httpRequest) {
 
-        log.info("Registration request for email: {}", registerRequest.getEmail());
+        // Extract client IP address for rate limiting
+        String ipAddress = getClientIpAddress(httpRequest);
 
-        AuthResponse authResponse = authService.register(registerRequest);
+        // Check rate limit BEFORE processing registration
+        if (!rateLimitService.allowRegisterAttempt(ipAddress)) {
+            throw new RateLimitException(
+                    "Too many registration attempts. Please try again in 1 minute."
+            );
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("User registered successfully", authResponse));
+        log.info("Registration attempt from IP: {}, email: {}", ipAddress, request.getEmail());
+
+        AuthResponse response = authService.register(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Registration successful", response));
     }
 
     /**
      * Login user
-     *
      * POST /api/auth/login
      *
-     * Request body:
-     * {
-     *   "email": "veteran@example.com",
-     *   "password": "SecurePassword123!"
-     * }
+     * SECURITY:
+     * - Rate limited to 5 attempts per minute per IP
+     * - Prevents brute force attacks
+     * - Returns JWT access token and refresh token
      *
-     * Response: 200 OK
-     * {
-     *   "success": true,
-     *   "message": "Login successful",
-     *   "data": {
-     *     "token": "eyJhbGciOiJIUzUxMiJ9...",
-     *     "refreshToken": "eyJhbGciOiJIUzUxMiJ9...",
-     *     "tokenType": "Bearer",
-     *     "expiresIn": 86400,
-     *     "user": { ...user details... }
-     *   }
-     * }
+     * @param request LoginRequest containing email and password
+     * @param httpRequest HTTP request to extract IP address
+     * @return AuthResponse with JWT tokens
      */
     @PostMapping("/login")
-    @Operation(summary = "Login user", description = "Authenticate user and return JWT tokens")
+    @Operation(summary = "Login", description = "Authenticate user and return JWT token")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
-            @Valid @RequestBody LoginRequest loginRequest) {
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
 
-        log.info("Login request for email: {}", loginRequest.getEmail());
+        // Extract client IP address for rate limiting
+        String ipAddress = getClientIpAddress(httpRequest);
 
-        AuthResponse authResponse = authService.login(loginRequest);
+        // Check rate limit BEFORE processing login
+        if (!rateLimitService.allowLoginAttempt(ipAddress)) {
+            long remaining = rateLimitService.getRemainingLoginAttempts(ipAddress);
+            throw new RateLimitException(
+                    "Too many login attempts. Please try again in 1 minute. " +
+                            "Remaining attempts: " + remaining
+            );
+        }
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Login successful", authResponse)
-        );
-    }
+        log.info("Login attempt from IP: {}, email: {}", ipAddress, request.getEmail());
 
-    /**
-     * Get current authenticated user
-     *
-     * GET /api/auth/me
-     *
-     * Headers:
-     * Authorization: Bearer <token>
-     *
-     * Response: 200 OK
-     * {
-     *   "success": true,
-     *   "message": "User retrieved successfully",
-     *   "data": {
-     *     "id": "123e4567-e89b-12d3-a456-426614174000",
-     *     "email": "veteran@example.com",
-     *     "firstName": "John",
-     *     "lastName": "Doe",
-     *     "fullName": "John Doe",
-     *     "branchOfService": "ARMY",
-     *     ...
-     *   }
-     * }
-     */
-    @GetMapping("/me")
-    @Operation(summary = "Get current user", description = "Get authenticated user's profile")
-    public ResponseEntity<ApiResponse<UserDTO>> getCurrentUser(
-            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        AuthResponse response = authService.login(request);
 
-        log.debug("Getting current user: {}", currentUser.getEmail());
-
-        UserDTO userDTO = authService.getCurrentUser(currentUser.getId());
-
-        return ResponseEntity.ok(
-                ApiResponse.success("User retrieved successfully", userDTO));
-    }
-
-    /**
-     * Refresh access token
-     *
-     * POST /api/auth/refresh
-     *
-     * Request body:
-     * {
-     *   "refreshToken": "eyJhbGciOiJIUzUxMiJ9..."
-     * }
-     *
-     * Response: 200 OK
-     * {
-     *   "success": true,
-     *   "message": "Token refreshed successfully",
-     *   "data": {
-     *     "token": "eyJhbGciOiJIUzUxMiJ9...",
-     *     "refreshToken": "eyJhbGciOiJIUzUxMiJ9...",
-     *     "tokenType": "Bearer",
-     *     "expiresIn": 86400,
-     *     "user": { ...user details... }
-     *   }
-     * }
-     */
-    @PostMapping("/refresh")
-    @Operation(summary = "Refresh token", description = "Get new access token using refresh token")
-    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
-            @RequestBody RefreshTokenRequest refreshTokenRequest) {
-
-        log.info("Token refresh request");
-
-        AuthResponse authResponse = authService.refreshToken(refreshTokenRequest.refreshToken());
-        return ResponseEntity.ok(
-                ApiResponse.success("Token refreshed successfully", authResponse)
-        );
+        return ResponseEntity.ok(ApiResponse.success("Login successful", response));
     }
 
     /**
      * Logout user
-     *
      * POST /api/auth/logout
      *
-     * Note: Since we're using JWT, logout is primarily client-side
-     * Client should delete the tokens
+     * SECURITY:
+     * - Blacklists JWT token server-side
+     * - Token becomes invalid immediately
+     * - Prevents token reuse
      *
-     * Response: 200 OK
-     * {
-     *   "success": true,
-     *   "message": "Logged out successfully"
-     * }
+     * @param httpRequest HTTP request to extract JWT token
+     * @return Success message
      */
     @PostMapping("/logout")
-    @Operation(summary = "Logout user", description = "Logout user (client-side token deletion)")
-    public ResponseEntity<ApiResponse<Void>> logout() {
-        log.info("Logout request");
+    @Operation(summary = "Logout", description = "Logout user and invalidate token")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest httpRequest) {
+        try {
+            // Extract token from Authorization header
+            String token = extractTokenFromRequest(httpRequest);
 
-        authService.logout();
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Logged out successfully")
-        );
+            if (token != null) {
+                authService.logout(token);
+                return ResponseEntity.ok(ApiResponse.success("Logged out successfully", null));
+            } else {
+                // No token provided - still clear client-side
+                return ResponseEntity.ok(ApiResponse.success("Logged out (no token provided)", null));
+            }
+        } catch (Exception e) {
+            log.error("Logout error: {}", e.getMessage());
+            // Even if server-side logout fails, return success
+            // Client should delete token anyway
+            return ResponseEntity.ok(ApiResponse.success("Logged out", null));
+        }
     }
 
-    // ========== HELPER DTO ==========
+    /**
+     * Refresh access token
+     * POST /api/auth/refresh
+     *
+     * USE CASE:
+     * - When access token expires (24 hours)
+     * - Client sends refresh token to get new access token
+     * - Refresh token valid for 7 days
+     *
+     * @param refreshToken Refresh token from client
+     * @return New access token
+     */
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh Token", description = "Get new access token using refresh token")
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
+            @RequestBody String refreshToken) {
+
+        log.debug("Token refresh attempt");
+
+        AuthResponse response = authService.refreshToken(refreshToken);
+
+        return ResponseEntity.ok(ApiResponse.success("Token refreshed", response));
+    }
 
     /**
-     * Simple DTO for refresh token request
+     * Validate token (useful for frontend)
+     * GET /api/auth/validate
+     *
+     * Returns 200 if token is valid, 401 if invalid
+     * Checked by JwtAuthenticationFilter automatically
      */
-    record RefreshTokenRequest(String refreshToken) {}
+    @GetMapping("/validate")
+    @Operation(summary = "Validate Token", description = "Check if current JWT token is valid")
+    public ResponseEntity<ApiResponse<Void>> validateToken() {
+        // If we reach here, token is valid (passed through JwtAuthenticationFilter)
+        return ResponseEntity.ok(ApiResponse.success("Token is valid", null));
+    }
+
+    /**
+     * Extract JWT token from Authorization header
+     *
+     * Authorization header format: "Bearer <token>"
+     * This method extracts the <token> part
+     *
+     * @param request HTTP request
+     * @return JWT token string, or null if not present
+     */
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    /**
+     * Extract client IP address from request
+     * Handles proxy headers (X-Forwarded-For, X-Real-IP)
+     *
+     * SECURITY NOTE:
+     * In production behind a proxy/load balancer, configure trusted proxies
+     * to prevent IP spoofing attacks
+     *
+     * HOW IT WORKS:
+     * 1. Check X-Forwarded-For header (set by proxies/load balancers)
+     * 2. Check X-Real-IP header (alternative proxy header)
+     * 3. Fall back to direct connection IP (getRemoteAddr)
+     * 4. If multiple IPs in X-Forwarded-For, use the first one (original client)
+     *
+     * @param request HTTP request
+     * @return Client IP address
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+
+        // If multiple IPs in X-Forwarded-For (client, proxy1, proxy2),
+        // take the first one (original client IP)
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+
+        return ip != null ? ip : "unknown";
+    }
 }

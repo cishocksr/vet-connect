@@ -21,6 +21,7 @@ import java.util.UUID;
  * - Password
  * - Authorities (roles/permissions)
  * - Account status flags
+ * - Token version (for bulk token invalidation) - SECURITY FEATURE
  */
 @AllArgsConstructor
 @Getter
@@ -29,6 +30,7 @@ public class CustomUserDetails implements UserDetails {
     private UUID id;
     private String email;
     private String password;
+    private Integer tokenVersion;  // ADD THIS FIELD
     private Collection<? extends GrantedAuthority> authorities;
 
     /**
@@ -47,6 +49,7 @@ public class CustomUserDetails implements UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPasswordHash(),
+                user.getTokenVersion(),  // ADD THIS PARAMETER
                 authorities
         );
     }

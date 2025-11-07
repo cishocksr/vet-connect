@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Add token_version column to users table
+
+        PURPOSE: Enable bulk token invalidation for security events
+        USE CASES:
+        - User changes password -> increment token_version -> all old tokens invalid
+        - Account compromise detected -> increment token_version -> force re-login
+        - Admin suspends account -> increment token_version -> immediate logout
+
+        HOW IT WORKS:
+        - Each user has a token_version number (starts at 1)
+        - JWT tokens include the token_version in claims
+        - On validation, we check: token.version == user.current_version
+        - If mismatch, token is invalid (even if not expired)
+        - Incrementing version invalidates ALL existing tokens instantly
+    -->
+    <changeSet id="009-add-token-version-to-users" author="vet-connect">
+        <!-- Add token_version column with default value 1 -->
+        <addColumn tableName="users">
+            <column name="token_version" type="INTEGER" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Add index for faster lookups -->
+        <createIndex tableName="users" indexName="idx_users_token_version">
+            <column name="token_version"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="users" indexName="idx_users_token_version"/>
+            <dropColumn tableName="users" columnName="token_version"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

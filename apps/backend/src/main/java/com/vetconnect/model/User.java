@@ -106,6 +106,21 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    /**
+     * Token version for bulk token invalidation
+     *
+     * SECURITY FEATURE:
+     * - When user changes password, increment this
+     * - When account is compromised, increment this
+     * - All tokens with old version become invalid instantly
+     * - No need to blacklist each token individually
+     */
+    @Column(name = "token_version", nullable = false)
+    @Builder.Default
+    private Integer tokenVersion = 1;
+
+    // ========== HELPER METHODS ==========
+
     public String getFullName() {
         return firstName + " " + lastName;
     }
@@ -115,5 +130,27 @@ public class User {
                 && city != null && !city.isBlank()
                 && state != null && !state.isBlank()
                 && zipCode != null && !zipCode.isBlank();
+    }
+
+    /**
+     * Increment token version to invalidate all existing tokens
+     *
+     * USE CASES:
+     * - Password changed
+     * - Security breach detected
+     * - Admin suspends account
+     *
+     * NOTE: Lombok's @Getter and @Setter automatically create
+     * getTokenVersion() and setTokenVersion() for us!
+     */
+    public void incrementTokenVersion() {
+        this.tokenVersion = (this.tokenVersion != null ? this.tokenVersion : 0) + 1;
+    }
+
+    /**
+     * Check if user is suspended
+     */
+    public Boolean getSuspended() {
+        return suspendedAt != null;
     }
 }

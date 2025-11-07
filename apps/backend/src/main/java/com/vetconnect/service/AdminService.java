@@ -2,6 +2,8 @@ package com.vetconnect.service;
 
 import com.vetconnect.dto.admin.*;
 import com.vetconnect.dto.user.UpdateUserRequest;
+import com.vetconnect.exception.ResourceNotFoundException;
+import com.vetconnect.exception.ValidationException;
 import com.vetconnect.mapper.AdminMapper;
 import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
@@ -131,27 +133,35 @@ public class AdminService {
 
     /**
      * Suspend user account
+     *
+     * SECURITY:
+     * - Sets suspended timestamp
+     * - Increments token version to invalidate all tokens
+     * - User cannot login until unsuspended
+     *
+     * @param userId User ID to suspend
+     * @param request Suspend request with reason
      */
     @Transactional
-    public AdminUserDetailDTO suspendUser(UUID userId, SuspendUserRequest request) {
-        log.info("Admin suspending user: {}", userId);
+    public void suspendUser(UUID userId, SuspendUserRequest request) {
+        log.debug("Admin suspending user: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        // Prevent self-suspension
         if (user.getRole() == UserRole.ADMIN) {
-            throw new RuntimeException("Cannot suspend admin users");
+            throw new ValidationException("Cannot suspend admin users");
         }
 
-        user.setActive(false);
         user.setSuspendedAt(LocalDateTime.now());
         user.setSuspendedReason(request.getReason());
 
-        User savedUser = userRepository.save(user);
+        // INCREMENT TOKEN VERSION - Invalidate all existing tokens immediately!
+        user.incrementTokenVersion();
 
-        log.info("User suspended successfully: {}", userId);
-        return adminMapper.toDetailDTO(savedUser);
+        userRepository.save(user);
+
+        log.info("User suspended: {} by admin. All tokens invalidated.", userId);
     }
 
     /**
