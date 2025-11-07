@@ -51,6 +51,7 @@ public class UserMapper {
                 .isHomeless(user.isHomeless())
                 .hasCompleteAddress(user.hasCompleteAddress())  // Computed from entity
                 .profilePictureUrl(user.getProfilePictureUrl())
+                .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
@@ -88,11 +89,9 @@ public class UserMapper {
      *
      * NOTE: Password should be hashed BEFORE calling this method
      *
-     * @param firstName User's first name
-     * @param lastName User's last name
-     * @param email User's email
+     * @param email User's email address
      * @param hashedPassword Already hashed password
-     * @param branchOfService Military branch
+     * @param request RegisterRequest containing user registration data
      * @return User entity (not yet saved to database)
      */
     public User toEntity(String email, String hashedPassword,

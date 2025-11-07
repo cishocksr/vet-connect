@@ -125,7 +125,7 @@ export default function LoginPage() {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full bg-military-navy hover:bg-military-navy/90"
+                            className="w-full bg-military-navy hover:bg-military-navy/90 text-white"
                             disabled={isLoggingIn}
                         >
                             {isLoggingIn ? (

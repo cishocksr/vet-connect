@@ -1,6 +1,7 @@
 package com.vetconnect.dto.user;
 
 import com.vetconnect.model.enums.BranchOfService;
+import com.vetconnect.model.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -97,6 +98,13 @@ public class UserDTO {
     private boolean isHomeless;
 
     private String profilePictureUrl;
+
+    /**
+     * User's role in the system
+     * Examples: USER, ADMIN
+     */
+    private UserRole role;
+
 
     /**
      * Convenience field: Does the user have a complete address?
