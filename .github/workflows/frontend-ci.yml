@@ -48,12 +48,12 @@ jobs:
 
       - name: Run tests
         working-directory: ./apps/frontend
-        run: pnpm test --run
+        run: pnpm test:ci
         continue-on-error: true
 
       - name: Generate coverage report
         working-directory: ./apps/frontend
-        run: pnpm test:coverage --run
+        run: pnpm test:coverage:ci
         continue-on-error: true
 
       - name: Upload coverage report

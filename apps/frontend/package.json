@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
+    "test:ci": "vitest --run",
     "test:coverage": "vitest --coverage",
+    "test:coverage:ci": "vitest --coverage --run",
     "lighthouse": "node lighthouse.config.js",
     "lighthouse:accessibility": "node lighthouse.config.js --only-categories=accessibility"
   },
