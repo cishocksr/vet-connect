@@ -68,6 +68,18 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<User> searchByName(@Param("name") String name);
 
+    /**
+     *
+     * @param role
+     * @param pageable
+     * @return
+     */
+    @Query("SELECT u FROM User u WHERE u.isDeleted = false")
+    List<User> findAllActive();
+
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.isDeleted = false")
+    Optional<User> findByEmailAndNotDeleted(@Param("email") String email);
+
     // Admin queries
     Page<User> findByRole(UserRole role, Pageable pageable);
 

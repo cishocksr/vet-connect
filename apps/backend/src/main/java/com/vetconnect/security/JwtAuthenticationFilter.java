@@ -67,7 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
                 // Step 4: Extract user info from token
-                String email = tokenProvider.getEmailFromToken(jwt);
                 UUID userId = tokenProvider.getUserIdFromToken(jwt);
                 Integer tokenVersion = tokenProvider.getTokenVersionFromToken(jwt);
 
@@ -78,8 +77,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                // Step 6: Load user details from database
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                // Step 6: Load user details from database BY ID (more efficient than by email)
+                UserDetails userDetails = userDetailsService.loadUserById(userId);
 
                 // Step 7: NEW SECURITY CHECK - Validate token version
                 // If user changed password or had security event, token version is incremented
@@ -92,6 +91,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         filterChain.doFilter(request, response);
                         return;
                     }
+                } else {
+                    // This should never happen, but log it if it does
+                    log.error("UserDetails is not an instance of CustomUserDetails for user: {}", userId);
+                    filterChain.doFilter(request, response);
+                    return;
                 }
 
                 // Step 8: Create authentication object
@@ -109,7 +113,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // Step 10: Store authentication in SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("Set authentication for user: {}", email);
+                log.debug("Set authentication for user: {}", userDetails.getUsername());
             }
         } catch (Exception e) {
             log.error("Cannot set user authentication: {}", e.getMessage());

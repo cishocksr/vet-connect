@@ -2,6 +2,7 @@ package com.vetconnect.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -211,6 +212,33 @@ public class JwtTokenProvider {
             log.error("JWT claims string is empty: {}", ex.getMessage());
         }
         return false;
+    }
+
+
+    @PostConstruct
+    public void validateJwtConfiguration() {
+        if (jwtSecret == null || jwtSecret.trim().isEmpty()) {
+            throw new IllegalStateException(
+                    "❌ JWT_SECRET environment variable must be set. " +
+                            "Generate with: openssl rand -base64 64"
+            );
+        }
+
+        // HS512 requires 512 bits = 64 bytes = 64 characters (when base64 encoded)
+        if (jwtSecret.length() < 64) {
+            throw new IllegalStateException(
+                    String.format(
+                            "❌ JWT secret is too short (%d characters). HS512 requires at least 64 characters. " +
+                                    "Current secret length: %d bits (need 512 bits minimum). " +
+                                    "Generate a secure secret with: openssl rand -base64 64",
+                            jwtSecret.length(),
+                            jwtSecret.length() * 8
+                    )
+            );
+        }
+
+        log.info("✅ JWT configuration validated successfully (secret length: {} characters / {} bits)",
+                jwtSecret.length(), jwtSecret.length() * 8);
     }
 
     /**

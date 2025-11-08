@@ -91,6 +91,12 @@ public class User {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
     @Column(name = "suspended_at")
     private LocalDateTime suspendedAt;
 
@@ -145,6 +151,11 @@ public class User {
      */
     public void incrementTokenVersion() {
         this.tokenVersion = (this.tokenVersion != null ? this.tokenVersion : 0) + 1;
+    }
+
+    public void markAsDeleted() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 
     /**

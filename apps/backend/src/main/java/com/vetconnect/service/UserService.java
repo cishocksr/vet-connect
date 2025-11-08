@@ -7,6 +7,7 @@ import com.vetconnect.dto.user.UserDTO;
 import com.vetconnect.dto.user.UserProfileDTO;
 import com.vetconnect.exception.InvalidCredentialsException;
 import com.vetconnect.exception.ResourceNotFoundException;
+import com.vetconnect.exception.ValidationException;
 import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
 import com.vetconnect.model.enums.BranchOfService;
@@ -351,30 +352,80 @@ public class UserService {
     }
 
     /**
-     * Delete user account
+     * Soft delete user (marks as deleted instead of removing from database)
      *
-     * IMPORTANT: This is a soft delete in production
-     * Consider implementing:
-     * - Soft delete flag (is_deleted = true)
-     * - Anonymization of personal data
-     * - Retention period before permanent deletion
+     * SECURITY:
+     * - Preserves data integrity
+     * - Allows data recovery if needed
+     * - Maintains referential integrity with saved resources
+     * - Increments token version to invalidate all tokens
      *
-     * @param userId User's UUID
-     * @throws RuntimeException if user not found
+     * @param userId User ID to delete
      */
     @Transactional
     public void deleteUser(UUID userId) {
-        log.warn("Deleting user: {}", userId);
+        log.debug("Soft deleting user: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        // TODO: Implement soft delete instead of hard delete
-        // user.setDeleted(true);
-        // user.setDeletedAt(LocalDateTime.now());
+        // Check if already deleted
+        if (user.getIsDeleted()) {
+            log.warn("Attempted to delete already deleted user: {}", userId);
+            throw new ValidationException("User is already deleted");
+        }
+
+        // Soft delete the user
+        user.markAsDeleted();  // ← HERE'S WHERE WE USE IT!
+
+        // Increment token version to invalidate all tokens
+        user.incrementTokenVersion();
+
+        userRepository.save(user);
+
+        log.info("User soft deleted successfully: {} ({})", user.getEmail(), userId);
+    }
+
+    /**
+     * Permanently delete a user (admin only - use with caution)
+     * This actually removes the user from the database
+     *
+     * @param userId User ID to permanently delete
+     */
+    @Transactional
+    public void permanentlyDeleteUser(UUID userId) {
+        log.warn("PERMANENT DELETE requested for user: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         userRepository.delete(user);
-        log.info("Successfully deleted user: {}", userId);
+
+        log.warn("User PERMANENTLY deleted: {} ({})", user.getEmail(), userId);
+    }
+
+    /**
+     * Restore a soft-deleted user (admin only)
+     *
+     * @param userId User ID to restore
+     */
+    @Transactional
+    public void restoreUser(UUID userId) {
+        log.debug("Restoring deleted user: {}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        if (!user.getIsDeleted()) {
+            throw new ValidationException("User is not deleted");
+        }
+
+        user.setIsDeleted(false);
+        user.setDeletedAt(null);
+
+        userRepository.save(user);
+
+        log.info("User restored successfully: {} ({})", user.getEmail(), userId);
     }
 
     /**
