@@ -183,10 +183,10 @@ public class AdminController {
 
         log.info("Admin updating user role: {} to {}", userId, request.getRole());
 
-        AdminUserDetailDTO user = adminService.updateUserRole(userId, request);
+        AdminUserDetailDTO updatedUser = adminService.updateUserRole(userId, request);
 
         return ResponseEntity.ok(
-                ApiResponse.success("User role updated successfully", user));
+                ApiResponse.success("User role updated successfully", updatedUser));
     }
 
     /**
@@ -196,17 +196,17 @@ public class AdminController {
      * Body: { "reason": "Violation of terms" }
      */
     @PostMapping("/users/{userId}/suspend")
-    @Operation(summary = "Suspend user", description = "Suspend user account")
+    @Operation(summary = "Suspend user", description = "Suspend user account with reason")
     public ResponseEntity<ApiResponse<AdminUserDetailDTO>> suspendUser(
             @PathVariable UUID userId,
             @Valid @RequestBody SuspendUserRequest request) {
 
         log.info("Admin suspending user: {}", userId);
 
-        AdminUserDetailDTO user = adminService.suspendUser(userId, request);
+        AdminUserDetailDTO updatedUser = adminService.suspendUser(userId, request);
 
         return ResponseEntity.ok(
-                ApiResponse.success("User suspended successfully", user));
+                ApiResponse.success("User suspended successfully", updatedUser));
     }
 
     /**
@@ -221,10 +221,10 @@ public class AdminController {
 
         log.info("Admin activating user: {}", userId);
 
-        AdminUserDetailDTO user = adminService.activateUser(userId);
+        AdminUserDetailDTO updatedUser = adminService.activateUser(userId);
 
         return ResponseEntity.ok(
-                ApiResponse.success("User activated successfully", user));
+                ApiResponse.success("User activated successfully", updatedUser));
     }
 
     /**
@@ -240,10 +240,10 @@ public class AdminController {
 
         log.info("Admin updating user: {}", userId);
 
-        AdminUserDetailDTO user = adminService.updateUser(userId, request);
+        AdminUserDetailDTO updatedUser = adminService.updateUser(userId, request);
 
         return ResponseEntity.ok(
-                ApiResponse.success("User updated successfully", user));
+                ApiResponse.success("User updated successfully", updatedUser));
     }
 
     /**
@@ -260,7 +260,7 @@ public class AdminController {
         adminService.deleteUser(userId);
 
         return ResponseEntity.ok(
-                ApiResponse.success("User deleted successfully", null));
+                ApiResponse.success("User deleted successfully"));
     }
 
     /**

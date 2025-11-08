@@ -111,7 +111,7 @@ class AuthServiceTest {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(tokenProvider.generateTokenFromUserId(any(UUID.class), anyString()))
+        when(tokenProvider.generateTokenFromUserId(any(UUID.class), anyString(), anyInt()))
                 .thenReturn("access-token");
         when(tokenProvider.generateRefreshToken(any(UUID.class), anyString()))
                 .thenReturn("refresh-token");
@@ -132,7 +132,7 @@ class AuthServiceTest {
         verify(userRepository).existsByEmail("test@example.com");
         verify(passwordEncoder).encode("Password123!");
         verify(userRepository).save(any(User.class));
-        verify(tokenProvider).generateTokenFromUserId(any(UUID.class), eq("test@example.com"));
+        verify(tokenProvider).generateTokenFromUserId(any(UUID.class), eq("test@example.com"), anyInt());
     }
 
     @Test
@@ -155,7 +155,7 @@ class AuthServiceTest {
         // Arrange
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
-        when(tokenProvider.generateTokenFromUserId(any(UUID.class), anyString()))
+        when(tokenProvider.generateTokenFromUserId(any(UUID.class), anyString(), anyInt()))
                 .thenReturn("access-token");
         when(tokenProvider.generateRefreshToken(any(UUID.class), anyString()))
                 .thenReturn("refresh-token");
@@ -201,7 +201,7 @@ class AuthServiceTest {
                 () -> authService.login(loginRequest));
 
         // Verify token was never generated
-        verify(tokenProvider, never()).generateTokenFromUserId(any(), anyString());
+        verify(tokenProvider, never()).generateTokenFromUserId(any(), anyString(), anyInt());
     }
 
     @Test
@@ -216,7 +216,7 @@ class AuthServiceTest {
         when(tokenProvider.getUserIdFromToken(refreshToken)).thenReturn(userId);
         when(tokenProvider.getEmailFromToken(refreshToken)).thenReturn(email);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(tokenProvider.generateTokenFromUserId(userId, email)).thenReturn("new-access-token");
+        when(tokenProvider.generateTokenFromUserId(userId, email, anyInt())).thenReturn("new-access-token");
         when(tokenProvider.generateRefreshToken(userId, email)).thenReturn("new-refresh-token");
         when(userMapper.toDTO(any(User.class))).thenReturn(userDTO);
 

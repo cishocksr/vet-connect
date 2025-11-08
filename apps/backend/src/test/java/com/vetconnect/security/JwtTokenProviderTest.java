@@ -38,7 +38,7 @@ class JwtTokenProviderTest {
     @DisplayName("Should generate valid JWT token")
     void testGenerateToken() {
         // Act
-        String token = tokenProvider.generateTokenFromUserId(userId, email);
+        String token = tokenProvider.generateTokenFromUserId(userId, email, 0);
 
         // Assert
         assertNotNull(token);
@@ -50,7 +50,7 @@ class JwtTokenProviderTest {
     @DisplayName("Should extract user ID from token")
     void testGetUserIdFromToken() {
         // Arrange
-        String token = tokenProvider.generateTokenFromUserId(userId, email);
+        String token = tokenProvider.generateTokenFromUserId(userId, email, 0);
 
         // Act
         UUID extractedUserId = tokenProvider.getUserIdFromToken(token);
@@ -63,7 +63,7 @@ class JwtTokenProviderTest {
     @DisplayName("Should extract email from token")
     void testGetEmailFromToken() {
         // Arrange
-        String token = tokenProvider.generateTokenFromUserId(userId, email);
+        String token = tokenProvider.generateTokenFromUserId(userId, email, 0);
 
         // Act
         String extractedEmail = tokenProvider.getEmailFromToken(token);
@@ -76,7 +76,7 @@ class JwtTokenProviderTest {
     @DisplayName("Should validate valid token")
     void testValidateToken_Valid() {
         // Arrange
-        String token = tokenProvider.generateTokenFromUserId(userId, email);
+        String token = tokenProvider.generateTokenFromUserId(userId, email, 0);
 
         // Act
         boolean isValid = tokenProvider.validateToken(token);
@@ -113,7 +113,7 @@ class JwtTokenProviderTest {
     @DisplayName("Should check if token is expired")
     void testIsTokenExpired() {
         // Arrange
-        String token = tokenProvider.generateTokenFromUserId(userId, email);
+        String token = tokenProvider.generateTokenFromUserId(userId, email, 0);
 
         // Act
         boolean isExpired = tokenProvider.isTokenExpired(token);
@@ -126,7 +126,7 @@ class JwtTokenProviderTest {
     @DisplayName("Should get expiration date from token")
     void testGetExpirationFromToken() {
         // Arrange
-        String token = tokenProvider.generateTokenFromUserId(userId, email);
+        String token = tokenProvider.generateTokenFromUserId(userId, email, 0);
 
         // Act
         Date expiration = tokenProvider.getExpirationFromToken(token);
@@ -140,7 +140,7 @@ class JwtTokenProviderTest {
     @DisplayName("Should calculate time until expiration")
     void testGetTimeUntilExpiration() {
         // Arrange
-        String token = tokenProvider.generateTokenFromUserId(userId, email);
+        String token = tokenProvider.generateTokenFromUserId(userId, email, 0);
 
         // Act
         long timeUntilExpiration = tokenProvider.getTimeUntilExpiration(token);

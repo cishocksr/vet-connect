@@ -101,26 +101,30 @@ public class AdminService {
         log.debug("Admin fetching user details: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
         return adminMapper.toDetailDTO(user);
     }
 
     /**
      * Update user role (promote/demote)
+     *
+     * SECURITY:
+     * - Prevents demoting the last admin user
+     * - Ensures at least one admin always exists in the system
      */
     @Transactional
     public AdminUserDetailDTO updateUserRole(UUID userId, UpdateUserRoleRequest request) {
         log.info("Admin updating user role: {} to {}", userId, request.getRole());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        // Prevent self-demotion
+        // Prevent self-demotion of last admin
         if (user.getRole() == UserRole.ADMIN && request.getRole() == UserRole.USER) {
             long adminCount = userRepository.countByRole(UserRole.ADMIN);
             if (adminCount <= 1) {
-                throw new RuntimeException("Cannot demote the last admin user");
+                throw new ValidationException("Cannot demote the last admin user");
             }
         }
 
@@ -135,44 +139,51 @@ public class AdminService {
      * Suspend user account
      *
      * SECURITY:
-     * - Sets suspended timestamp
-     * - Increments token version to invalidate all tokens
-     * - User cannot login until unsuspended
+     * - Deactivates account immediately
+     * - Sets suspended timestamp for audit trail
+     * - Records reason for suspension
+     * - User cannot login until reactivated
      *
      * @param userId User ID to suspend
      * @param request Suspend request with reason
+     * @return Updated user details
      */
     @Transactional
-    public void suspendUser(UUID userId, SuspendUserRequest request) {
-        log.debug("Admin suspending user: {}", userId);
+    public AdminUserDetailDTO suspendUser(UUID userId, SuspendUserRequest request) {
+        log.info("Admin suspending user: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        if (user.getRole() == UserRole.ADMIN) {
-            throw new ValidationException("Cannot suspend admin users");
-        }
-
+        user.setActive(false);
         user.setSuspendedAt(LocalDateTime.now());
         user.setSuspendedReason(request.getReason());
 
-        // INCREMENT TOKEN VERSION - Invalidate all existing tokens immediately!
-        user.incrementTokenVersion();
+        User savedUser = userRepository.save(user);
 
-        userRepository.save(user);
+        log.info("User {} suspended. Reason: {}", userId, request.getReason());
 
-        log.info("User suspended: {} by admin. All tokens invalidated.", userId);
+        return adminMapper.toDetailDTO(savedUser);
     }
 
     /**
      * Activate user account
+     *
+     * ACTIONS:
+     * - Reactivates suspended account
+     * - Clears suspension timestamp
+     * - Clears suspension reason
+     * - User can login immediately
+     *
+     * @param userId User ID to activate
+     * @return Updated user details
      */
     @Transactional
     public AdminUserDetailDTO activateUser(UUID userId) {
         log.info("Admin activating user: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
         user.setActive(true);
         user.setSuspendedAt(null);
@@ -186,13 +197,17 @@ public class AdminService {
 
     /**
      * Admin can update any user's information
+     *
+     * @param userId User ID to update
+     * @param request Update request with new user data
+     * @return Updated user details
      */
     @Transactional
     public AdminUserDetailDTO updateUser(UUID userId, UpdateUserRequest request) {
         log.info("Admin updating user: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
         userMapper.updateEntityFromDTO(user, request);
         User savedUser = userRepository.save(user);
@@ -203,17 +218,24 @@ public class AdminService {
 
     /**
      * Delete user (hard delete - use with caution)
+     *
+     * SECURITY:
+     * - Prevents deleting admin users
+     * - Permanently removes user and all associated data
+     * - Cannot be undone
+     *
+     * @param userId User ID to delete
      */
     @Transactional
     public void deleteUser(UUID userId) {
         log.warn("Admin deleting user: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
         // Prevent deleting admin users
         if (user.getRole() == UserRole.ADMIN) {
-            throw new RuntimeException("Cannot delete admin users");
+            throw new ValidationException("Cannot delete admin users");
         }
 
         userRepository.delete(user);
@@ -222,6 +244,16 @@ public class AdminService {
 
     /**
      * Get system statistics for admin dashboard
+     *
+     * STATISTICS INCLUDED:
+     * - Total users
+     * - Active/suspended user counts
+     * - Homeless veteran count
+     * - New user registrations (today and this month)
+     * - User distribution by military branch
+     * - User distribution by state (top 10)
+     *
+     * @return Admin statistics DTO
      */
     public AdminStatsDTO getSystemStats() {
         log.debug("Admin fetching system statistics");
