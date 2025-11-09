@@ -1,4 +1,12 @@
+# ============================================
+# DEFAULT CONFIGURATION (Development)
+# ============================================
+# For production, set SPRING_PROFILES_ACTIVE=prod
+# This will load application-prod.yml which overrides these settings
+
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
     name: vet-connect-backend
   servlet:
@@ -95,11 +103,13 @@ management:
   endpoints:
     web:
       exposure:
+        # DEVELOPMENT: Expose all endpoints for debugging
+        # PRODUCTION: application-prod.yml restricts this to health,info only
         include: health,info,metrics,prometheus
       base-path: /actuator
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: when-authorized  # Only show details to authenticated users
       probes:
         enabled: true
   metrics:

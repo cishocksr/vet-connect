@@ -67,11 +67,18 @@ public class SecurityConfig {
                                 "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/actuator/health"
+                                "/v3/api-docs/**"
                         ).permitAll()
 
-                        // Public resource endpoints
+                        // Actuator endpoints - health and info are public, rest require ADMIN
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/health/**",  // Include /actuator/health/liveness, etc.
+                                "/actuator/info"
+                        ).permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")  // All other actuator endpoints require ADMIN
+
+                        // Public resource endpoints (read-only)
                         .requestMatchers(HttpMethod.GET,
                                 "/api/resources/**",
                                 "/api/categories/**"
@@ -79,6 +86,9 @@ public class SecurityConfig {
 
                         // Static file serving (uploaded images)
                         .requestMatchers("/uploads/**").permitAll()
+
+                        // Admin endpoints - require ADMIN role
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         // Protected endpoints - require authentication
                         .requestMatchers("/api/users/**").authenticated()
@@ -98,6 +108,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     /**
      * Authentication provider using custom UserDetailsService

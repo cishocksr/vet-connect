@@ -40,5 +40,8 @@ build/
 .env.*.local
 
 # Sensitive configuration
+# Allow application-prod.yml (contains structure, not secrets)
+# Secrets are provided via environment variables
 application-*.yml
 !application-test.yml
+!application-prod.yml

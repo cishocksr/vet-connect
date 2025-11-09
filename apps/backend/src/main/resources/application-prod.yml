@@ -1,0 +1,103 @@
+# ============================================
+# PRODUCTION CONFIGURATION
+# ============================================
+# This file is automatically loaded when SPRING_PROFILES_ACTIVE=prod
+# It overrides settings from application.yml
+
+spring:
+  # JPA Configuration
+  jpa:
+    show-sql: false  # CRITICAL: Never show SQL in production logs
+    hibernate:
+      ddl-auto: none  # Never auto-update schema in production
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        # Enable query performance logging (logs queries > 1 second)
+        session:
+          events:
+            log:
+              LOG_QUERIES_SLOWER_THAN_MS: 1000
+
+  # Datasource Configuration
+  datasource:
+    hikari:
+      # Production connection pool settings
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:5}
+      connection-timeout: 20000
+      idle-timeout: 300000  # 5 minutes
+      max-lifetime: 600000  # 10 minutes
+      connection-test-query: SELECT 1
+      leak-detection-threshold: 60000  # Detect connection leaks after 60 seconds
+
+  # Liquibase - ensure migrations run
+  liquibase:
+    enabled: true
+    drop-first: false  # NEVER drop database in production
+
+# Server Configuration
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: never  # Don't expose binding errors in production
+    include-stacktrace: never  # CRITICAL: Never expose stack traces
+    include-exception: false
+  # Enable compression for better performance
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024  # Compress responses larger than 1KB
+
+# Logging Configuration
+logging:
+  level:
+    root: WARN  # Only show warnings and errors by default
+    com.vetconnect: INFO  # Our application at INFO level
+    org.springframework.security: WARN  # Reduce security noise
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN  # Don't log SQL queries
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN  # Don't log SQL parameters
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  # File logging (optional - usually use external log aggregation in production)
+  file:
+    name: ${LOG_FILE:/var/log/vet-connect/application.log}
+    max-size: 10MB
+    max-history: 30  # Keep 30 days of logs
+    total-size-cap: 1GB
+
+# Management & Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info  # Only expose health and info publicly
+        # Metrics and prometheus require authentication (configured in SecurityConfig)
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized  # Only show details to authenticated users
+      probes:
+        enabled: true  # Enable Kubernetes liveness/readiness probes
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true  # Track request latency percentiles
+    tags:
+      application: ${spring.application.name}
+      environment: prod
+
+# Security Headers (additional to SecurityConfig.java)
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true  # Only send cookies over HTTPS
+        http-only: true  # Prevent JavaScript access to cookies
+        same-site: strict  # CSRF protection
