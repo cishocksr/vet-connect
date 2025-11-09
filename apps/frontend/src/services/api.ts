@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+
+
+// Use runtime config if available, fallback to build-time env var
+const getApiBaseUrl = () => {
+    if (typeof window !== 'undefined' && window.ENV?.API_BASE_URL) {
+        return window.ENV.API_BASE_URL;
+    }
+    return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+    baseURL: getApiBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
     },

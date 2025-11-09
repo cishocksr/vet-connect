@@ -55,12 +55,21 @@ class AuthService {
     }
 
     /**
-     * Logout (client-side only for now)
+     * Logout user and invalidate token server-side
      */
-    logout(): void {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
+    async logout(): Promise<void> {
+        try {
+            // Call backend to blacklist token
+            await api.post('/auth/logout');
+        } catch (error) {
+            // Log error but still clear client-side storage
+            console.error('Logout API call failed:', error);
+        } finally {
+            // Always clear local storage, even if API call fails
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+        }
     }
 }
 

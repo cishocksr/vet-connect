@@ -1,5 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import  { Component, type ErrorInfo, type ReactNode } from 'react';import { AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface Props {
@@ -13,24 +12,28 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-    public state: State = {
-        hasError: false
-    };
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            hasError: false,
+            error: undefined
+        };
+    }
 
-    public static getDerivedStateFromError(error: Error): State {
+    public static getDerivedStateFromError(error: Error): Partial<State> {
         return { hasError: true, error };
     }
 
-    public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
         console.error('Error boundary caught error:', error, errorInfo);
         // TODO: Send to error reporting service (Sentry, etc.)
     }
 
-    private handleReset = () => {
+    private handleReset = (): void => {
         this.setState({ hasError: false, error: undefined });
     };
 
-    public render() {
+    public render(): ReactNode {
         if (this.state.hasError) {
             return (
                 <div className="min-h-screen flex items-center justify-center p-4">

@@ -1,2 +1,7 @@
-/// <reference types="vitest" />
-/// <reference types="@testing-library/jest-dom" />
+/// <reference types="vite/client" />
+
+interface Window {
+    ENV?: {
+        API_BASE_URL: string;
+    };
+}
