@@ -307,6 +307,23 @@
                 <version>3.20.0</version>
             </plugin>
         </plugins>
+        <!-- Resource filtering to replace @ placeholders in YAML -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>application-info.yml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>application-info.yml</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
 
    

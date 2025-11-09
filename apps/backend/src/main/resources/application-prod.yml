@@ -14,11 +14,20 @@ spring:
       hibernate:
         format_sql: false
         use_sql_comments: false
-        # Enable query performance logging (logs queries > 1 second)
+        # Enable query performance logging
         session:
           events:
             log:
-              LOG_QUERIES_SLOWER_THAN_MS: 1000
+              LOG_QUERIES_SLOWER_THAN_MS: 1000  # Log queries slower than 1 second
+        # Additional performance settings
+        jdbc:
+          batch_size: 20  # Batch inserts for better performance
+        order_inserts: true
+        order_updates: true
+        # Query plan cache
+        query:
+          plan_cache_max_size: 2048
+          plan_parameter_metadata_max_size: 128
 
   # Datasource Configuration
   datasource:
@@ -26,11 +35,23 @@ spring:
       # Production connection pool settings
       maximum-pool-size: ${DB_POOL_MAX:20}
       minimum-idle: ${DB_POOL_MIN:5}
-      connection-timeout: 20000
-      idle-timeout: 300000  # 5 minutes
-      max-lifetime: 600000  # 10 minutes
-      connection-test-query: SELECT 1
-      leak-detection-threshold: 60000  # Detect connection leaks after 60 seconds
+      connection-timeout: 20000  # 20 seconds to get connection from pool
+      idle-timeout: 300000  # 5 minutes - close idle connections
+      max-lifetime: 600000  # 10 minutes - maximum connection lifetime
+
+      # Connection validation
+      connection-test-query: SELECT 1  # Test query before giving connection
+      validation-timeout: 5000  # 5 seconds timeout for validation
+
+      # Leak detection (helps find connection leaks during testing)
+      leak-detection-threshold: 60000  # 60 seconds - log warning if connection held too long
+
+      # Pool name for monitoring
+      pool-name: VetConnectHikariPool
+
+      # Additional production settings
+      auto-commit: true
+      register-mbeans: true  # Enable JMX monitoring
 
   # Liquibase - ensure migrations run
   liquibase:
@@ -61,13 +82,15 @@ logging:
     org.hibernate.SQL: WARN  # Don't log SQL queries
     org.hibernate.type.descriptor.sql.BasicBinder: WARN  # Don't log SQL parameters
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    # Include request ID in log pattern for request tracing
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%thread] %-5level %logger{36} - %msg%n"
   # File logging (optional - usually use external log aggregation in production)
   file:
     name: ${LOG_FILE:/var/log/vet-connect/application.log}
     max-size: 10MB
     max-history: 30  # Keep 30 days of logs
     total-size-cap: 1GB
+
 
 # Management & Monitoring
 management:

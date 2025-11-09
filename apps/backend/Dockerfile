@@ -18,6 +18,9 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+# Install curl for health checks (lighter than wget)
+RUN apk add --no-cache curl
+
 # Create uploads directory BEFORE switching to non-root user
 RUN mkdir -p /app/uploads/profile-pictures
 
@@ -39,9 +42,9 @@ USER spring:spring
 # Expose port
 EXPOSE 8080
 
-# Health check
+# Health check using curl instead of wget
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]

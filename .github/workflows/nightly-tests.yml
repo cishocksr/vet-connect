@@ -24,6 +24,15 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -39,6 +48,11 @@ jobs:
 
       - name: Run all tests
         working-directory: ./apps/backend
+        env:
+          JWT_SECRET: test-secret-key-for-testing-must-be-at-least-256-bits-long-to-work-properly
+          POSTGRES_PASSWORD: postgres
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
         run: mvn clean verify
 
       - name: Generate comprehensive report

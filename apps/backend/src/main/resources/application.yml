@@ -4,7 +4,11 @@
 # For production, set SPRING_PROFILES_ACTIVE=prod
 # This will load application-prod.yml which overrides these settings
 
+# Import application info
 spring:
+  config:
+    import: optional:classpath:application-info.yml
+
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
@@ -76,7 +80,8 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    # Include request ID for request tracing
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] - %msg%n"
 
 # Springdoc OpenAPI (Swagger)
 springdoc:
@@ -99,6 +104,17 @@ app:
     dir: ${FILE_UPLOAD_DIR:uploads/profile-pictures}
     max-file-size: 5242880  # 5MB in bytes
 
+  # Security configuration
+  security:
+    # CRITICAL: Set trusted proxy IPs in production
+    # This prevents IP spoofing attacks on rate limiting
+    # Set to the IP addresses of your:
+    # - Load balancer (AWS ALB, GCP Load Balancer, etc.)
+    # - Reverse proxy (nginx, Apache, etc.)
+    # - CDN (Cloudflare, CloudFront, etc.)
+    # Example: 10.0.1.100,10.0.1.101
+    trusted-proxies: ${TRUSTED_PROXY_IPS:}
+
 management:
   endpoints:
     web:
@@ -119,3 +135,4 @@ management:
     tags:
       application: ${spring.application.name}
       environment: ${SPRING_PROFILES_ACTIVE:dev}
+

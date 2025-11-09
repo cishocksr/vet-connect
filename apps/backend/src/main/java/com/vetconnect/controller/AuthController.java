@@ -1,5 +1,6 @@
 package com.vetconnect.controller;
 
+import com.vetconnect.config.TrustedProxyConfig;
 import com.vetconnect.dto.auth.AuthResponse;
 import com.vetconnect.dto.auth.LoginRequest;
 import com.vetconnect.dto.auth.RegisterRequest;
@@ -42,6 +43,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RedisRateLimitService rateLimitService;
+    private final TrustedProxyConfig trustedProxyConfig;
 
     /**
      * Register a new user
@@ -209,38 +211,58 @@ public class AuthController {
 
     /**
      * Extract client IP address from request
-     * Handles proxy headers (X-Forwarded-For, X-Real-IP)
+     * Handles proxy headers securely (X-Forwarded-For, X-Real-IP)
      *
-     * SECURITY NOTE:
-     * In production behind a proxy/load balancer, configure trusted proxies
-     * to prevent IP spoofing attacks
+     * SECURITY IMPLEMENTATION:
+     * - Only trusts X-Forwarded-For from configured trusted proxies
+     * - Prevents IP spoofing attacks
+     * - Falls back to direct connection IP if no trusted proxy
      *
      * HOW IT WORKS:
-     * 1. Check X-Forwarded-For header (set by proxies/load balancers)
-     * 2. Check X-Real-IP header (alternative proxy header)
-     * 3. Fall back to direct connection IP (getRemoteAddr)
-     * 4. If multiple IPs in X-Forwarded-For, use the first one (original client)
+     * 1. Check if request came from trusted proxy
+     * 2. If yes, trust X-Forwarded-For header
+     * 3. If no, use direct connection IP (ignore headers)
+     * 4. Extract first IP from X-Forwarded-For (original client)
+     *
+     * PRODUCTION SETUP:
+     * Set app.security.trusted-proxies in application-prod.yml to your:
+     * - Load balancer IPs
+     * - Reverse proxy IPs (nginx, Apache, etc.)
+     * - CDN IPs (Cloudflare, etc.)
      *
      * @param request HTTP request
      * @return Client IP address
      */
     private String getClientIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
+        String remoteAddr = request.getRemoteAddr();
 
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Real-IP");
+        // If we have trusted proxies configured and request came from trusted proxy,
+        // then we can trust the X-Forwarded-For header
+        if (trustedProxyConfig.hasTrustedProxies() &&
+                trustedProxyConfig.isTrustedProxy(remoteAddr)) {
+
+            // Try X-Forwarded-For (most common)
+            String forwardedFor = request.getHeader("X-Forwarded-For");
+            if (forwardedFor != null && !forwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(forwardedFor)) {
+                // X-Forwarded-For can contain multiple IPs: "client, proxy1, proxy2"
+                // Take the first one (original client IP)
+                String clientIp = forwardedFor.split(",")[0].trim();
+                log.debug("Using X-Forwarded-For IP from trusted proxy: {} (proxy: {})", clientIp, remoteAddr);
+                return clientIp;
+            }
+
+            // Try X-Real-IP (alternative header used by some proxies)
+            String realIp = request.getHeader("X-Real-IP");
+            if (realIp != null && !realIp.isEmpty() && !"unknown".equalsIgnoreCase(realIp)) {
+                log.debug("Using X-Real-IP from trusted proxy: {} (proxy: {})", realIp, remoteAddr);
+                return realIp;
+            }
         }
 
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-
-        // If multiple IPs in X-Forwarded-For (client, proxy1, proxy2),
-        // take the first one (original client IP)
-        if (ip != null && ip.contains(",")) {
-            ip = ip.split(",")[0].trim();
-        }
-
-        return ip != null ? ip : "unknown";
+        // No trusted proxy or headers not available - use direct connection IP
+        // This is the secure default - can't be spoofed
+        log.debug("Using direct connection IP: {}", remoteAddr);
+        return remoteAddr != null ? remoteAddr : "unknown";
     }
+
 }

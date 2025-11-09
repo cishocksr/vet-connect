@@ -294,12 +294,24 @@ public class GlobalExceptionHandler {
 
         log.error("Type mismatch: {}", ex.getMessage());
 
-        String message = String.format(
-                "Invalid value '%s' for parameter '%s'. Expected type: %s",
-                ex.getValue(),
-                ex.getName(),
-                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
-        );
+        String message;
+
+        // In production, don't expose the actual value (could be sensitive)
+        if ("prod".equals(activeProfile)) {
+            message = String.format(
+                    "Invalid value for parameter '%s'. Expected type: %s",
+                    ex.getName(),
+                    ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
+            );
+        } else {
+            // In dev/test, show the value for easier debugging
+            message = String.format(
+                    "Invalid value '%s' for parameter '%s'. Expected type: %s",
+                    ex.getValue(),
+                    ex.getName(),
+                    ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
+            );
+        }
 
         ErrorResponse errorResponse = ErrorResponse.create(
                 HttpStatus.BAD_REQUEST.value(),
