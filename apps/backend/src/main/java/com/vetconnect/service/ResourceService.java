@@ -6,6 +6,7 @@ import com.vetconnect.mapper.ResourceMapper;
 import com.vetconnect.model.Resource;
 import com.vetconnect.model.ResourceCategory;
 import com.vetconnect.repository.ResourceRepository;
+import com.vetconnect.util.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class ResourceService {
     private final ResourceRepository resourceRepository;
     private final ResourceMapper resourceMapper;
     private final ResourceCategoryService categoryService;
+    private final InputSanitizer inputSanitizer;
 
     // ========== READ OPERATIONS ==========
 
@@ -267,6 +269,19 @@ public class ResourceService {
             throw new RuntimeException("Local resources must have a state");
         }
 
+        // Sanitize text inputs
+        createRequest.setName(inputSanitizer.sanitizeHtml(createRequest.getName()));
+        createRequest.setDescription(inputSanitizer.sanitizeHtml(createRequest.getDescription()));
+        if (createRequest.getAddressLine1() != null) {
+            createRequest.setAddressLine1(inputSanitizer.sanitizeHtml(createRequest.getAddressLine1()));
+        }
+        if (createRequest.getCity() != null) {
+            createRequest.setCity(inputSanitizer.sanitizeHtml(createRequest.getCity()));
+        }
+        if (createRequest.getZipCode() != null) {
+            createRequest.setZipCode(inputSanitizer.sanitizeHtml(createRequest.getZipCode()));
+        }
+
         // Get category
         ResourceCategory category = categoryService.getCategoryEntityById(createRequest.getCategoryId());
 
@@ -300,6 +315,26 @@ public class ResourceService {
         // Get existing resource
         Resource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new RuntimeException("Resource not found with ID: " + resourceId));
+
+        // Sanitize text inputs
+        if (updateRequest.getName() != null) {
+            updateRequest.setName(inputSanitizer.sanitizeHtml(updateRequest.getName()));
+        }
+        if (updateRequest.getDescription() != null) {
+            updateRequest.setDescription(inputSanitizer.sanitizeHtml(updateRequest.getDescription()));
+        }
+        if (updateRequest.getAddressLine1() != null) {  // FIXED: was getAddress()
+            updateRequest.setAddressLine1(inputSanitizer.sanitizeHtml(updateRequest.getAddressLine1()));
+        }
+        if (updateRequest.getCity() != null) {
+            updateRequest.setCity(inputSanitizer.sanitizeHtml(updateRequest.getCity()));
+        }
+        if (updateRequest.getZipCode() != null) {
+            updateRequest.setZipCode(inputSanitizer.sanitizeHtml(updateRequest.getZipCode()));
+        }
+        if (updateRequest.getEligibilityCriteria() != null) {  // Also sanitize this field
+            updateRequest.setEligibilityCriteria(inputSanitizer.sanitizeHtml(updateRequest.getEligibilityCriteria()));
+        }
 
         // Get new category if provided
         ResourceCategory category = null;

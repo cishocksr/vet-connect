@@ -8,6 +8,7 @@ import com.vetconnect.model.Resource;
 import com.vetconnect.model.SavedResource;
 import com.vetconnect.model.User;
 import com.vetconnect.repository.SavedResourcesRepository;
+import com.vetconnect.util.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class SavedResourceService {
     private final SavedResourceMapper savedResourceMapper;
     private final UserService userService;
     private final ResourceService resourceService;
+    private final InputSanitizer inputSanitizer;
 
     // ========== READ OPERATIONS ==========
 
@@ -126,6 +128,7 @@ public class SavedResourceService {
      * @return Created SavedResourceDTO
      * @throws RuntimeException if resource already saved or not found
      */
+
     @Transactional
     public SavedResourceDTO saveResource(UUID userId, SaveResourceRequest saveRequest) {
         log.info("User {} saving resource: {}", userId, saveRequest.getResourceId());
@@ -138,11 +141,16 @@ public class SavedResourceService {
             throw new RuntimeException("Resource already saved");
         }
 
+        // Sanitize notes if provided
+        String sanitizedNotes = saveRequest.getNotes() != null
+                ? inputSanitizer.sanitizeHtml(saveRequest.getNotes())
+                : null;
+
         // Create saved resource
         SavedResource savedResource = SavedResource.builder()
                 .user(user)
                 .resource(resource)
-                .notes(saveRequest.getNotes())
+                .notes(sanitizedNotes)  // Use sanitized notes
                 .build();
 
         SavedResource saved = savedResourcesRepository.save(savedResource);
@@ -196,8 +204,11 @@ public class SavedResourceService {
             throw new RuntimeException("Saved resource does not belong to user");
         }
 
-        // Update notes
-        savedResource.setNotes(notesRequest.getNotes());
+        // Sanitize and update notes
+        String sanitizedNotes = notesRequest.getNotes() != null
+                ? inputSanitizer.sanitizeHtml(notesRequest.getNotes())
+                : null;
+        savedResource.setNotes(sanitizedNotes);
 
         SavedResource updated = savedResourcesRepository.save(savedResource);
         log.info("Successfully updated notes for saved resource: {}", savedResourceId);

@@ -10,6 +10,7 @@ import com.vetconnect.model.User;
 import com.vetconnect.model.enums.BranchOfService;
 import com.vetconnect.model.enums.UserRole;
 import com.vetconnect.repository.UserRepository;
+import com.vetconnect.util.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,7 @@ public class AdminService {
     private final UserRepository userRepository;
     private final AdminMapper adminMapper;
     private final UserMapper userMapper;
+    private final InputSanitizer inputSanitizer;
 
     /**
      * Get all users with pagination and filtering
@@ -148,6 +150,7 @@ public class AdminService {
      * @param request Suspend request with reason
      * @return Updated user details
      */
+
     @Transactional
     public AdminUserDetailDTO suspendUser(UUID userId, SuspendUserRequest request) {
         log.info("Admin suspending user: {}", userId);
@@ -155,13 +158,18 @@ public class AdminService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
+        // Sanitize suspension reason
+        String sanitizedReason = request.getReason() != null
+                ? inputSanitizer.sanitizeHtml(request.getReason())
+                : null;
+
         user.setActive(false);
         user.setSuspendedAt(LocalDateTime.now());
-        user.setSuspendedReason(request.getReason());
+        user.setSuspendedReason(sanitizedReason);  // Use sanitized reason
 
         User savedUser = userRepository.save(user);
 
-        log.info("User {} suspended. Reason: {}", userId, request.getReason());
+        log.info("User {} suspended. Reason: {}", userId, sanitizedReason);
 
         return adminMapper.toDetailDTO(savedUser);
     }
@@ -202,12 +210,21 @@ public class AdminService {
      * @param request Update request with new user data
      * @return Updated user details
      */
+
     @Transactional
     public AdminUserDetailDTO updateUser(UUID userId, UpdateUserRequest request) {
         log.info("Admin updating user: {}", userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        // Sanitize text fields
+        if (request.getFirstName() != null) {
+            request.setFirstName(inputSanitizer.sanitizeHtml(request.getFirstName()));
+        }
+        if (request.getLastName() != null) {
+            request.setLastName(inputSanitizer.sanitizeHtml(request.getLastName()));
+        }
 
         userMapper.updateEntityFromDTO(user, request);
         User savedUser = userRepository.save(user);

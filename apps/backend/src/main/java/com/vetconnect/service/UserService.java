@@ -12,6 +12,7 @@ import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
 import com.vetconnect.model.enums.BranchOfService;
 import com.vetconnect.repository.UserRepository;
+import com.vetconnect.util.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,6 +49,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final FileStorageService fileStorageService;
+    private final InputSanitizer inputSanitizer;
 
     // ========== READ OPERATIONS ==========
 
@@ -251,6 +253,7 @@ public class UserService {
      * @return Updated UserDTO
      * @throws RuntimeException if user not found or validation fails
      */
+
     @Transactional
     public UserDTO updateUserProfile(UUID userId, UpdateUserRequest updateRequest) {
         log.info("Updating profile for user: {}", userId);
@@ -263,6 +266,14 @@ public class UserService {
         // Get existing user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Sanitize text fields before applying updates
+        if (updateRequest.getFirstName() != null) {
+            updateRequest.setFirstName(inputSanitizer.sanitizeHtml(updateRequest.getFirstName()));
+        }
+        if (updateRequest.getLastName() != null) {
+            updateRequest.setLastName(inputSanitizer.sanitizeHtml(updateRequest.getLastName()));
+        }
 
         // Apply updates
         userMapper.updateEntityFromDTO(user, updateRequest);
@@ -293,6 +304,20 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Sanitize address fields
+        if (addressRequest.getAddressLine1() != null) {
+            addressRequest.setAddressLine1(inputSanitizer.sanitizeHtml(addressRequest.getAddressLine1()));
+        }
+        if (addressRequest.getAddressLine2() != null) {
+            addressRequest.setAddressLine2(inputSanitizer.sanitizeHtml(addressRequest.getAddressLine2()));
+        }
+        if (addressRequest.getCity() != null) {
+            addressRequest.setCity(inputSanitizer.sanitizeHtml(addressRequest.getCity()));
+        }
+        if (addressRequest.getZipCode() != null) {
+            addressRequest.setZipCode(inputSanitizer.sanitizeHtml(addressRequest.getZipCode()));
+        }
 
         // Apply address updates
         userMapper.updateAddressFromDTO(user, addressRequest);

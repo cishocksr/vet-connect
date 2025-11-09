@@ -7,6 +7,7 @@ import com.vetconnect.dto.common.ApiResponse;
 import com.vetconnect.exception.RateLimitException;
 import com.vetconnect.service.AuthService;
 import com.vetconnect.service.RateLimitService;
+import com.vetconnect.service.RedisRateLimitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final RateLimitService rateLimitService;
+    private final RedisRateLimitService rateLimitService;
 
     /**
      * Register a new user

@@ -10,6 +10,7 @@ import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
 import com.vetconnect.repository.UserRepository;
 import com.vetconnect.security.JwtTokenProvider;
+import com.vetconnect.util.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,7 +52,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final TokenBlacklistService tokenBlacklistService;  // ADD THIS FIELD
+    private final TokenBlacklistService tokenBlacklistService;
+    private final InputSanitizer inputSanitizer;
 
     /**
      * Register new user
@@ -68,6 +70,7 @@ public class AuthService {
      * @return AuthResponse with tokens and user info
      * @throws EmailAlreadyExistsException if email already exists
      */
+
     @Transactional
     public AuthResponse register(RegisterRequest registerRequest) {
         log.info("Registering new user: {}", registerRequest.getEmail());
@@ -80,38 +83,53 @@ public class AuthService {
         // 2. Hash password
         String hashedPassword = passwordEncoder.encode(registerRequest.getPassword());
 
-        // 3. Create user entity with initial token version
+        // 3. Sanitize all user inputs to prevent XSS
+        String sanitizedFirstName = inputSanitizer.sanitizeHtml(registerRequest.getFirstName());
+        String sanitizedLastName = inputSanitizer.sanitizeHtml(registerRequest.getLastName());
+        String sanitizedAddressLine1 = registerRequest.getAddressLine1() != null
+                ? inputSanitizer.sanitizeHtml(registerRequest.getAddressLine1())
+                : null;
+        String sanitizedAddressLine2 = registerRequest.getAddressLine2() != null
+                ? inputSanitizer.sanitizeHtml(registerRequest.getAddressLine2())
+                : null;
+        String sanitizedCity = registerRequest.getCity() != null
+                ? inputSanitizer.sanitizeHtml(registerRequest.getCity())
+                : null;
+        String sanitizedZipCode = registerRequest.getZipCode() != null
+                ? inputSanitizer.sanitizeHtml(registerRequest.getZipCode())
+                : null;
+
+        // 4. Create user entity with sanitized inputs and initial token version
         User user = User.builder()
-                .email(registerRequest.getEmail())
+                .email(registerRequest.getEmail())  // Email validation handled by @Email annotation
                 .passwordHash(hashedPassword)
-                .firstName(registerRequest.getFirstName())
-                .lastName(registerRequest.getLastName())
+                .firstName(sanitizedFirstName)  // Use sanitized value
+                .lastName(sanitizedLastName)    // Use sanitized value
                 .branchOfService(registerRequest.getBranchOfService())
-                .addressLine1(registerRequest.getAddressLine1())
-                .addressLine2(registerRequest.getAddressLine2())
-                .city(registerRequest.getCity())
-                .state(registerRequest.getState())
-                .zipCode(registerRequest.getZipCode())
+                .addressLine1(sanitizedAddressLine1)  // Use sanitized value
+                .addressLine2(sanitizedAddressLine2)  // Use sanitized value
+                .city(sanitizedCity)           // Use sanitized value
+                .state(registerRequest.getState())  // State is validated enum/pattern
+                .zipCode(sanitizedZipCode)     // Use sanitized value
                 .isHomeless(registerRequest.isHomeless())
-                .tokenVersion(1)  // INITIALIZE TOKEN VERSION FOR NEW USERS
+                .tokenVersion(1)
                 .build();
 
-        // 4. Save user
+        // 5. Save user
         User savedUser = userRepository.save(user);
         log.info("Successfully registered user: {}", savedUser.getEmail());
 
-        // 5. Generate tokens WITH TOKEN VERSION
+        // Rest of method unchanged...
         String accessToken = tokenProvider.generateTokenFromUserId(
                 savedUser.getId(),
                 savedUser.getEmail(),
-                savedUser.getTokenVersion()  // ADD TOKEN VERSION
+                savedUser.getTokenVersion()
         );
         String refreshToken = tokenProvider.generateRefreshToken(
                 savedUser.getId(),
                 savedUser.getEmail()
         );
 
-        // 6. Build response
         UserDTO userDTO = userMapper.toDTO(savedUser);
 
         return AuthResponse.builder()

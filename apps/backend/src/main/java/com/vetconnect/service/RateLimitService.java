@@ -32,8 +32,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * - Smooth refill (not reset at fixed intervals)
  * - More user-friendly for legitimate users
  */
+/**
+ * DEPRECATED: Use RedisRateLimitService instead
+ *
+ * This in-memory implementation does NOT work with multiple server instances.
+ * Kept for backwards compatibility and local development only.
+ *
+ * @deprecated Use {@link RedisRateLimitService} for production deployments
+ */
 @Service
 @Slf4j
+@Deprecated
 public class RateLimitService {
 
     // Store buckets in memory (per IP address)
