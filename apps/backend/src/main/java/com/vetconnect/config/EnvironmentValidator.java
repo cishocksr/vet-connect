@@ -13,12 +13,12 @@ import java.util.List;
  * Validates required environment variables on application startup
  * Fails fast if critical configuration is missing
  *
- * IMPORTANT: Runs on ALL profiles EXCEPT dev
+ * IMPORTANT: Runs on ALL profiles EXCEPT dev and test
  * This ensures production validation happens even if someone
  * forgets to set SPRING_PROFILES_ACTIVE=prod
  */
 @Configuration
-@Profile("!dev")  // CHANGED: Run on all profiles except dev (was just "prod")
+@Profile("!dev & !test")  // Run on all profiles except dev and test
 @Slf4j
 public class EnvironmentValidator {
 

@@ -64,7 +64,7 @@ public class UserService {
         log.debug("Fetching user by ID: {}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
         return userMapper.toDTO(user);
     }

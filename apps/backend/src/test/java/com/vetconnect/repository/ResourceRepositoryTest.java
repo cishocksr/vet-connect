@@ -50,6 +50,7 @@ class ResourceRepositoryTest {
                 .zipCode("20147")
                 .isNational(false)
                 .build();
+        entityManager.flush();
     }
 
     @Test
@@ -57,6 +58,8 @@ class ResourceRepositoryTest {
     void testSaveResource() {
         // Act
         Resource savedResource = resourceRepository.save(resource);
+        entityManager.flush();
+        entityManager.clear();
 
         // Assert
         assertNotNull(savedResource.getId());

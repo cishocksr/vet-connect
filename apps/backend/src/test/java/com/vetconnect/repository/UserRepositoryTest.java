@@ -41,6 +41,7 @@ class UserRepositoryTest {
                 .state("VA")
                 .zipCode("20147")
                 .isHomeless(false)
+                .isDeleted(false)
                 .build();
     }
 
@@ -49,6 +50,7 @@ class UserRepositoryTest {
     void testSaveUser() {
         // Act
         User savedUser = userRepository.save(testUser);
+        userRepository.flush();
 
         // Assert
         assertNotNull(savedUser.getId());
@@ -103,6 +105,7 @@ class UserRepositoryTest {
                 .lastName("Vet")
                 .branchOfService(BranchOfService.ARMY)
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         User navyUser = User.builder()
@@ -112,6 +115,7 @@ class UserRepositoryTest {
                 .lastName("Vet")
                 .branchOfService(BranchOfService.NAVY)
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         userRepository.save(armyUser);
@@ -137,6 +141,7 @@ class UserRepositoryTest {
                 .branchOfService(BranchOfService.MARINES)
                 .isHomeless(true)
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         userRepository.save(testUser); // Not homeless
@@ -162,6 +167,7 @@ class UserRepositoryTest {
                 .branchOfService(BranchOfService.AIR_FORCE)
                 .state("VA")
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         User mdUser = User.builder()
@@ -172,6 +178,7 @@ class UserRepositoryTest {
                 .branchOfService(BranchOfService.COAST_GUARD)
                 .state("MD")
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         userRepository.save(vaUser);
@@ -196,6 +203,7 @@ class UserRepositoryTest {
                 .lastName("Doe")
                 .branchOfService(BranchOfService.ARMY)
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         User janeSmith = User.builder()
@@ -205,6 +213,7 @@ class UserRepositoryTest {
                 .lastName("Smith")
                 .branchOfService(BranchOfService.NAVY)
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         userRepository.save(johnDoe);
@@ -231,6 +240,7 @@ class UserRepositoryTest {
                 .lastName("Person")
                 .branchOfService(BranchOfService.SPACE_FORCE)
                 .zipCode("12345")
+                .isDeleted(false)
                 .build();
 
         // Act & Assert

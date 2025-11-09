@@ -7,6 +7,7 @@ import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
 import com.vetconnect.model.enums.BranchOfService;
 import com.vetconnect.repository.UserRepository;
+import com.vetconnect.util.InputSanitizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ class UserServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private InputSanitizer inputSanitizer;
 
     @InjectMocks
     private UserService userService;
@@ -129,6 +133,7 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
         when(userMapper.toDTO(updatedUser)).thenReturn(updatedUserDTO);
+        when(inputSanitizer.sanitizeHtml(any(String.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
         UserDTO result = userService.updateUserProfile(userId, updateRequest);

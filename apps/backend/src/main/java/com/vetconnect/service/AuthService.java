@@ -112,6 +112,7 @@ public class AuthService {
                 .state(registerRequest.getState())  // State is validated enum/pattern
                 .zipCode(sanitizedZipCode)     // Use sanitized value
                 .isHomeless(registerRequest.isHomeless())
+                .isDeleted(false)
                 .tokenVersion(1)
                 .build();
 
