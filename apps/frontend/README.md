@@ -1,73 +1,122 @@
-# React + TypeScript + Vite
+# VetConnect Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern React TypeScript application for the VetConnect platform.
 
-Currently, two official plugins are available:
+## 🛠️ Technology Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework:** React 18 with TypeScript
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS
+- **UI Components:** Shadcn/ui
+- **State Management:** Zustand + TanStack Query
+- **Form Handling:** React Hook Form + Zod
+- **Routing:** React Router DOM v6
+- **HTTP Client:** Axios
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 📁 Project Structure
+```
+src/
+├── components/        # Reusable React components
+│   ├── ui/           # Shadcn/ui components
+│   ├── auth/         # Authentication components
+│   ├── resources/    # Resource-related components
+│   └── layout/       # Layout components
+├── pages/            # Page components (routes)
+├── hooks/            # Custom React hooks
+├── services/         # API service layer
+├── store/            # Zustand stores
+├── types/            # TypeScript type definitions
+├── utils/            # Utility functions
+└── lib/              # Library configurations
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
+- Node.js 20+
+- pnpm (`npm install -g pnpm`)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+```bash
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Preview production build
+pnpm preview
 ```
+
+## 🧪 Testing
+```bash
+# Run tests
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Run tests in watch mode
+pnpm test:watch
+```
+
+## 📝 Environment Variables
+
+Create `.env` file:
+```bash
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+For production, create `.env.production`:
+```bash
+VITE_API_BASE_URL=https://api.vetconnect.com/api
+```
+
+## 🎨 UI Components
+
+This project uses [Shadcn/ui](https://ui.shadcn.com/) components. All UI components are in `src/components/ui/`.
+
+### Adding New Components
+```bash
+npx shadcn-ui@latest add button
+```
+
+## 🔐 Authentication Flow
+
+1. User registers/logs in via AuthService
+2. JWT tokens stored in localStorage
+3. Axios interceptor adds token to requests
+4. Token refresh handled automatically
+5. Protected routes redirect to login if unauthenticated
+
+## 📦 Key Features
+
+- **Resource Discovery:** Browse and search veteran resources
+- **Saved Resources:** Bookmark resources with personal notes
+- **User Dashboard:** Manage saved resources
+- **Profile Management:** Update user profile and preferences
+- **Military Branch Themes:** Dynamic UI theming based on branch of service
+- **Responsive Design:** Mobile-first, works on all devices
+
+## 🏗️ Build & Deployment
+
+### Docker Build
+```bash
+docker build -t vetconnect-frontend .
+docker run -p 80:80 vetconnect-frontend
+```
+
+### Production Deployment
+
+The frontend is containerized with Nginx. See `Dockerfile` and `nginx.conf` for configuration.
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution guidelines.
+
+## 📄 License
+
+Apache License 2.0
