@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.apache.tika.Tika;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +37,7 @@ public class FileStorageService {
     private long maxFileSize;
 
     private static final String[] ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"};
+    private final Tika tika = new Tika();
 
     /**
      * Initialize upload directory on startup
@@ -149,8 +150,24 @@ public class FileStorageService {
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new RuntimeException("File must be an image");
         }
-    }
 
+        // NEW: Validate actual file content using magic bytes
+        try {
+            String detectedType = tika.detect(file.getInputStream());
+            log.debug("Detected file type: {}", detectedType);
+
+            if (!detectedType.startsWith("image/")) {
+                log.warn("File content mismatch. Extension: {}, Declared type: {}, Detected type: {}",
+                        extension, contentType, detectedType);
+                throw new RuntimeException(
+                        "File content does not match image type. Detected: " + detectedType
+                );
+            }
+        } catch (IOException e) {
+            log.error("Failed to detect file type", e);
+            throw new RuntimeException("Failed to validate file content");
+        }
+    }
     /**
      * Get file extension from filename
      */
