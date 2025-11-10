@@ -49,8 +49,17 @@ api.interceptors.response.use(
                         { refreshToken }
                     );
 
-                    const { token } = response.data.data;
+                    // Extract BOTH tokens and user data from response
+                    const { token, refreshToken: newRefreshToken, user } = response.data.data;
+
+                    // Update ALL tokens in localStorage
                     localStorage.setItem('token', token);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+
+                    // Also update user data if included
+                    if (user) {
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
 
                     originalRequest.headers.Authorization = `Bearer ${token}`;
                     return api(originalRequest);
