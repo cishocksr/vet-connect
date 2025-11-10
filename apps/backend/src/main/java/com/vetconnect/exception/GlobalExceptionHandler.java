@@ -459,6 +459,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
+    /**
+     * Handle RateLimitException
+     *
+     * Thrown when user exceeds rate limit
+     *
+     * HTTP STATUS: 429 Too Many Requests
+     */
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitException(
+            RateLimitException ex,
+            HttpServletRequest request) {
+
+        log.warn("Rate limit exceeded: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.create(
+                429,  // HTTP 429 Too Many Requests
+                "Too Many Requests",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(429).body(errorResponse);
+    }
+
     // ========== HELPER METHODS ==========
 
     /**

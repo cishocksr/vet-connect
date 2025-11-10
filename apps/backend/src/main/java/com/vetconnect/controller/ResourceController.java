@@ -3,6 +3,7 @@ package com.vetconnect.controller;
 import com.vetconnect.dto.common.ApiResponse;
 import com.vetconnect.dto.common.PageResponse;
 import com.vetconnect.dto.resource.*;
+import com.vetconnect.exception.ValidationException;
 import com.vetconnect.service.ResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -162,6 +164,25 @@ public class ResourceController {
         log.debug("Searching resources - keyword: {}, category: {}, state: {}, page: {}",
                 keyword, categoryId, state, page);
 
+        // Validate sortBy field - whitelist of allowed fields
+        List<String> allowedSortFields = Arrays.asList(
+                "name", "createdAt", "updatedAt", "city", "state"
+        );
+        if (!allowedSortFields.contains(sortBy)) {
+            throw new ValidationException(
+                    "Invalid sortBy field: " + sortBy +
+                            ". Allowed fields: " + String.join(", ", allowedSortFields)
+            );
+        }
+
+        // Validate sortDirection
+        if (!sortDirection.equalsIgnoreCase("ASC") && !sortDirection.equalsIgnoreCase("DESC")) {
+            throw new ValidationException(
+                    "Invalid sortDirection: " + sortDirection +
+                            ". Allowed values: ASC, DESC"
+            );
+        }
+
         // Build search request
         ResourceSearchRequest searchRequest = ResourceSearchRequest.builder()
                 .keyword(keyword)
@@ -171,8 +192,9 @@ public class ResourceController {
                 .page(page)
                 .size(size)
                 .sortBy(sortBy)
-                .sortDirection(sortDirection)
+                .sortDirection(sortDirection.toUpperCase())  // Normalize to uppercase
                 .build();
+
 
         // Get results - use the simpler method that returns PageResponse
         PageResponse<ResourceSummaryDTO> results = resourceService.searchResourcesSimple(searchRequest);

@@ -5,6 +5,7 @@ import com.vetconnect.dto.auth.LoginRequest;
 import com.vetconnect.dto.auth.RegisterRequest;
 import com.vetconnect.dto.user.UserDTO;
 import com.vetconnect.exception.EmailAlreadyExistsException;
+import com.vetconnect.exception.InvalidTokenException;
 import com.vetconnect.exception.ResourceNotFoundException;
 import com.vetconnect.mapper.UserMapper;
 import com.vetconnect.model.User;
@@ -254,20 +255,29 @@ public class AuthService {
             throw new RuntimeException("Invalid refresh token");
         }
 
-        // 2. Extract user ID
+        // 2. Extract user ID AND token version from refresh token
         UUID userId = tokenProvider.getUserIdFromToken(refreshToken);
         String email = tokenProvider.getEmailFromToken(refreshToken);
+        Integer refreshTokenVersion = tokenProvider.getTokenVersionFromToken(refreshToken);  // ADD THIS
 
         // 3. Verify user still exists and get CURRENT token version
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 4. Generate new tokens WITH CURRENT TOKEN VERSION FROM DATABASE
-        // This is critical - if token version changed, old refresh tokens won't work
+        // 4. SECURITY CHECK: Validate token version
+        // If user changed password, token version was incremented
+        // Old refresh tokens should not work
+        if (!refreshTokenVersion.equals(user.getTokenVersion())) {
+            log.warn("Refresh token version mismatch for user: {}. Token version: {}, Current version: {}",
+                    userId, refreshTokenVersion, user.getTokenVersion());
+            throw new InvalidTokenException("Refresh token is no longer valid. Please login again.");
+        }
+
+        // 5. Generate new tokens WITH CURRENT TOKEN VERSION FROM DATABASE
         String newAccessToken = tokenProvider.generateTokenFromUserId(
                 user.getId(),
                 user.getEmail(),
-                user.getTokenVersion()  // USE CURRENT VERSION FROM DATABASE
+                user.getTokenVersion()
         );
         String newRefreshToken = tokenProvider.generateRefreshToken(
                 user.getId(),

@@ -25,7 +25,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-vet_connect}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword123}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -48,6 +48,9 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # Spring Profile - CRITICAL for production
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+
       # Database configuration
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432

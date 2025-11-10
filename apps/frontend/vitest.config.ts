@@ -15,7 +15,7 @@ export default defineConfig({
             exclude: [
                 'node_modules/',
                 'src/__test__/',
-                '**/*.config.ts',
+                '**/*.config.js',
                 '**/*.d.ts',
                 '**/main.tsx',
                 '**/vite-env.d.ts'

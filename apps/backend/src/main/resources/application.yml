@@ -28,6 +28,9 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
       connection-timeout: 20000
+      register-mbeans: true  # ADD THIS - Enable JMX monitoring in dev too
+      pool-name: VetConnectHikariPool-Dev  # ADD THIS - Distinguish dev pool
+
 
   jpa:
     hibernate:
@@ -44,12 +47,21 @@ spring:
     enabled: true
 
   # Redis for token blacklist
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      timeout: 60000
+data:
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 5000  # 5 seconds is more reasonable
+    connect-timeout: 2000  # ADD THIS - 2 second connection timeout
+    lettuce:  # ADD THIS SECTION
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+        max-wait: 2000  # Max wait time for connection from pool
+      shutdown-timeout: 100  # Graceful shutdown timeout
+
 
   security:
     oauth2:
@@ -59,6 +71,11 @@ spring:
 
 server:
   port: 8080
+  # Request size limits to prevent DoS attacks
+  max-http-request-header-size: 20KB
+  tomcat:
+    max-swallow-size: 10MB
+    max-http-form-post-size: 2MB
   error:
     include-message: always
     include-binding-errors: always

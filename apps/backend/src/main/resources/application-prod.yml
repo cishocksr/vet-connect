@@ -61,6 +61,11 @@ spring:
 # Server Configuration
 server:
   port: 8080
+  # Stricter limits in production
+  max-http-request-header-size: 10KB
+  tomcat:
+    max-swallow-size: 5MB
+    max-http-form-post-size: 1MB
   error:
     include-message: always
     include-binding-errors: never  # Don't expose binding errors in production
@@ -71,6 +76,13 @@ server:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
     min-response-size: 1024  # Compress responses larger than 1KB
+  # Security: Session cookies
+  servlet:
+    session:
+      cookie:
+        secure: true  # Only send cookies over HTTPS
+        http-only: true  # Prevent JavaScript access to cookies
+        same-site: strict  # CSRF protection
 
 # Logging Configuration
 logging:
@@ -91,6 +103,12 @@ logging:
     max-history: 30  # Keep 30 days of logs
     total-size-cap: 1GB
 
+# Springdoc OpenAPI (Swagger) - DISABLED IN PRODUCTION
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 # Management & Monitoring
 management:
@@ -106,21 +124,9 @@ management:
       probes:
         enabled: true  # Enable Kubernetes liveness/readiness probes
   metrics:
-    export:
-      prometheus:
-        enabled: true
     distribution:
       percentiles-histogram:
         http.server.requests: true  # Track request latency percentiles
     tags:
       application: ${spring.application.name}
       environment: prod
-
-# Security Headers (additional to SecurityConfig.java)
-server:
-  servlet:
-    session:
-      cookie:
-        secure: true  # Only send cookies over HTTPS
-        http-only: true  # Prevent JavaScript access to cookies
-        same-site: strict  # CSRF protection
