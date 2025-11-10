@@ -95,7 +95,7 @@ export default function RegisterPage() {
                 : error instanceof Error
                 ? error.message
                 : 'Registration failed. Please try again.';
-            setErrorMessage(message);
+            setErrorMessage(message || 'Registration failed. Please try again.');
         } finally {
             setIsSubmitting(false);
         }

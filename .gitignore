@@ -36,3 +36,8 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+ARCHITECTURE.md
+LEARNING_FILES.md
+LEARNING_GUIDE.md
+LEARNING_GUIDE_SUMMARY.md
