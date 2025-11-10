@@ -218,10 +218,15 @@ class AuthServiceTest {
         String refreshToken = "valid-refresh-token";
         UUID userId = UUID.randomUUID();
         String email = "test@example.com";
+        Integer tokenVersion = 0;
+
+        // Set token version on user
+        user.setTokenVersion(tokenVersion);
 
         when(tokenProvider.validateToken(refreshToken)).thenReturn(true);
         when(tokenProvider.getUserIdFromToken(refreshToken)).thenReturn(userId);
         when(tokenProvider.getEmailFromToken(refreshToken)).thenReturn(email);
+        when(tokenProvider.getTokenVersionFromToken(refreshToken)).thenReturn(tokenVersion);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(tokenProvider.generateTokenFromUserId(any(UUID.class), anyString(), anyInt())).thenReturn("new-access-token");
         when(tokenProvider.generateRefreshToken(any(UUID.class), anyString())).thenReturn("new-refresh-token");

@@ -66,8 +66,11 @@ export default function AdminUserDetail() {
             toast.success('User role updated successfully');  // CHANGED
             setShowRoleDialog(false);
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to update user role');  // CHANGED
+        onError: (error: unknown) => {
+            const message = error && typeof error === 'object' && 'response' in error
+                ? (error.response as { data?: { message?: string } })?.data?.message
+                : undefined;
+            toast.error(message || 'Failed to update user role');  // CHANGED
         }
     });
 
@@ -81,8 +84,11 @@ export default function AdminUserDetail() {
             setShowSuspendDialog(false);
             setSuspendReason('');
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to suspend user');  // CHANGED
+        onError: (error: unknown) => {
+            const message = error && typeof error === 'object' && 'response' in error
+                ? (error.response as { data?: { message?: string } })?.data?.message
+                : undefined;
+            toast.error(message || 'Failed to suspend user');  // CHANGED
         }
     });
 
@@ -94,8 +100,11 @@ export default function AdminUserDetail() {
             queryClient.invalidateQueries({ queryKey: ['admin-users'] });
             toast.success('User activated successfully');  // CHANGED
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to activate user');  // CHANGED
+        onError: (error: unknown) => {
+            const message = error && typeof error === 'object' && 'response' in error
+                ? (error.response as { data?: { message?: string } })?.data?.message
+                : undefined;
+            toast.error(message || 'Failed to activate user');  // CHANGED
         }
     });
 
@@ -106,8 +115,11 @@ export default function AdminUserDetail() {
             toast.success('User deleted successfully');  // CHANGED
             navigate('/admin/users');
         },
-        onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to delete user');  // CHANGED
+        onError: (error: unknown) => {
+            const message = error && typeof error === 'object' && 'response' in error
+                ? (error.response as { data?: { message?: string } })?.data?.message
+                : undefined;
+            toast.error(message || 'Failed to delete user');  // CHANGED
         }
     });
 

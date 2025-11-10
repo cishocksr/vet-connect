@@ -78,6 +78,7 @@ export default function RegisterPage() {
             setErrorMessage('');
 
             // Remove confirmPassword before sending to backend
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { confirmPassword, ...registerData } = data;
 
             await registerUser(registerData as RegisterRequest, {
@@ -85,13 +86,15 @@ export default function RegisterPage() {
                     navigate('/dashboard');
                 },
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Registration failed:', error);
 
             // Display error message to user
-            const message = error.response?.data?.message
-                || error.message
-                || 'Registration failed. Please try again.';
+            const message = error && typeof error === 'object' && 'response' in error
+                ? (error.response as { data?: { message?: string } })?.data?.message
+                : error instanceof Error
+                ? error.message
+                : 'Registration failed. Please try again.';
             setErrorMessage(message);
         } finally {
             setIsSubmitting(false);
