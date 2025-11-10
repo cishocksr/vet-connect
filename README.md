@@ -1,135 +1,183 @@
-# Turborepo starter
+# VetConnect - Veteran Resource Platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+<div align="center">
 
-## Using this example
+![VetConnect Logo](docs/images/logo.png)
 
-Run the following command:
+**Connecting U.S. Veterans with Essential Resources**
 
-```sh
-npx create-turbo@latest
+[![Build Status](https://github.com/yourusername/vetconnect/workflows/CI/badge.svg)](https://github.com/yourusername/vetconnect/actions)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![codecov](https://codecov.io/gh/yourusername/vetconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/vetconnect)
+
+[Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](#contributing)
+
+</div>
+
+---
+
+## 🎖️ About VetConnect
+
+VetConnect is a comprehensive web platform designed to help U.S. military veterans easily discover and access essential resources including:
+
+- 🏠 **Housing Assistance** - Emergency shelter, transitional housing, permanent supportive housing
+- 💰 **Financial Aid** - VA benefits, emergency funds, debt assistance
+- 🎓 **Education & Training** - GI Bill programs, vocational training, career counseling
+- 🧠 **Mental Health Services** - PTSD treatment, counseling, crisis support
+- 🏥 **Healthcare** - VA medical centers, community health clinics, specialized care
+
+### Why VetConnect?
+
+Veterans often struggle to navigate the complex landscape of available resources. VetConnect provides:
+- ✅ Centralized resource discovery
+- ✅ Location-based search (state and nationwide resources)
+- ✅ Personalized dashboard for saved resources
+- ✅ Detailed resource information with contact details
+- ✅ Military branch-themed interface for familiarity
+
+---
+
+## 🛠️ Technology Stack
+
+**Frontend:**
+- React 18 + TypeScript
+- Vite for fast development
+- Tailwind CSS for styling
+- TanStack Query for state management
+- React Hook Form + Zod for validation
+
+**Backend:**
+- Java 21 + Spring Boot 3.5
+- PostgreSQL 15 database
+- Redis for token blacklist & rate limiting
+- JWT authentication with refresh tokens
+- Liquibase for database migrations
+
+**Infrastructure:**
+- Docker & Docker Compose
+- GitHub Actions CI/CD
+- AWS deployment (RDS, ElastiCache, ECS)
+- Nginx reverse proxy
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Java 21+
+- Node.js 20+
+- Docker & Docker Compose
+- pnpm (`npm install -g pnpm`)
+
+### Local Development
+```bash
+# 1. Clone repository
+git clone https://github.com/yourusername/vetconnect.git
+cd vetconnect
+
+# 2. Set up environment variables
+cp apps/backend/.env.example apps/backend/.env
+cp apps/frontend/.env.example apps/frontend/.env
+
+# Edit .env files with your local configuration
+
+# 3. Start infrastructure (PostgreSQL + Redis)
+docker-compose up -d
+
+# 4. Start backend
+cd apps/backend
+mvn spring-boot:run
+
+# 5. Start frontend (new terminal)
+cd apps/frontend
+pnpm install
+pnpm dev
 ```
 
-## What's inside?
+Access the application at `http://localhost:5173`
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## 📚 Documentation
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- [Backend API Documentation](apps/backend/README.md) - Complete API reference
+- [Frontend Documentation](apps/frontend/README.md) - Component library and architecture
+- [Deployment Guide](apps/backend/DEPLOYMENT.MD) - Production deployment instructions
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+---
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
+## 🏗️ Project Structure
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+vetconnect/
+├── apps/
+│   ├── backend/          # Spring Boot REST API
+│   ├── frontend/         # React TypeScript application
+│   └── docs/            # Documentation site (optional)
+├── .github/
+│   └── workflows/       # CI/CD pipelines
+├── docker-compose.yml   # Local development infrastructure
+└── turbo.json          # Monorepo configuration
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## 🔐 Security Features
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+- ✅ JWT authentication with token blacklisting
+- ✅ Redis-backed refresh token rotation
+- ✅ BCrypt password hashing
+- ✅ Rate limiting on authentication endpoints
+- ✅ CORS protection
+- ✅ SQL injection prevention via JPA
+- ✅ Input validation on all endpoints
+- ✅ Secure file uploads with type validation
+- ✅ OWASP dependency scanning
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## 🧪 Testing
+```bash
+# Backend tests
+cd apps/backend
+mvn test
+mvn jacoco:report  # Generate coverage report
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+# Frontend tests
+cd apps/frontend
+pnpm test
+pnpm test:coverage
 ```
 
-### Remote Caching
+---
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## 🤝 Contributing
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+This project welcomes contributions from the community. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+---
 
-```
-cd my-turborepo
+## 📄 License
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+Licensed under the Apache License 2.0 - see [LICENSE](LICENSE) file for details.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+---
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 💙 Acknowledgments
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+Built with dedication to serve those who served. Thank you to all U.S. military veterans for your service.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+**Note:** This is a learning project designed to help veterans access resources while demonstrating modern full-stack development practices.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+---
 
-## Useful Links
+## 📧 Contact
 
-Learn more about the power of Turborepo:
+- Project Repository: [https://github.com/yourusername/vetconnect](https://github.com/yourusername/vetconnect)
+- Report Issues: [https://github.com/yourusername/vetconnect/issues](https://github.com/yourusername/vetconnect/issues)
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+---
+
+<div align="center">
+Made with ❤️ for U.S. Veterans
+</div>
