@@ -23,7 +23,7 @@
 
         <!-- Dependency Version Overrides for Security -->
         <hibernate.version>6.6.5.Final</hibernate.version>
-        <byte-buddy.version>1.15.11</byte-buddy.version>
+        <byte-buddy.version>1.17.8</byte-buddy.version>
         <liquibase.version>4.30.0</liquibase.version>
         <springdoc.version>2.7.0</springdoc.version>
         <jjwt.version>0.12.5</jjwt.version>
