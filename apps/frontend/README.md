@@ -1,4 +1,4 @@
-# VetConnect Frontend
+ # VetConnect Frontend
 
 Modern React TypeScript application for the VetConnect platform.
 

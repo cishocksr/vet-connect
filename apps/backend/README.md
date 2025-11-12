@@ -769,7 +769,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 👥 Authors
 
-- **Your Name** - *Initial work* - [YourGitHub](https://github.com/yourusername)
+- **Christopher Shockley** - *Initial work* - [YourGitHub](https://github.com/yourusername)
 
 ---
 
