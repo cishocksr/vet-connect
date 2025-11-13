@@ -60,7 +60,7 @@ jobs:
         run: mvn site
 
       - name: Upload site report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: maven-site
           path: apps/backend/target/site/
