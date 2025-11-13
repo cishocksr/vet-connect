@@ -6,9 +6,9 @@
 
 **Connecting U.S. Veterans with Essential Resources**
 
-[![Build Status](https://github.com/yourusername/vetconnect/workflows/CI/badge.svg)](https://github.com/yourusername/vetconnect/actions)
+[![Build Status](https://github.com/cishocksr/vetconnect/workflows/CI/badge.svg)](https://github.com/yourusername/vetconnect/actions)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/yourusername/vetconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/vetconnect)
+[![codecov](https://codecov.io/gh/yourusername/vetconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/cishockst/vetconnect)
 
 [Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](#contributing)
 
@@ -150,6 +150,40 @@ pnpm test:coverage
 ```
 
 ---
+
+## 🔧 Environment Variables
+
+### Backend (`apps/backend/.env`)
+```bash
+# Database
+POSTGRES_DB=vet_connect
+POSTGRES_USER=vetconnect_user
+POSTGRES_PASSWORD=<generate with: openssl rand -base64 32>
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+# JWT (CRITICAL: Generate unique secret for production)
+JWT_SECRET=<generate with: openssl rand -base64 64>
+JWT_EXPIRATION=86400000
+JWT_REFRESH_EXPIRATION=604800000
+JWT_ISSUER_URI=http://localhost:8080
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=<leave empty for dev, set for prod>
+
+# CORS (CRITICAL: Set to production domain in prod)
+CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+
+# Profile
+SPRING_PROFILES_ACTIVE=dev
+```
+
+### Frontend (`apps/frontend/.env`)
+```bash
+VITE_API_BASE_URL=http://localhost:8080/api
+```
 
 ## 🤝 Contributing
 

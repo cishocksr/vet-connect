@@ -58,7 +58,6 @@ jobs:
           flags: backend
           name: backend-coverage
           fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Archive test results
         if: always()
