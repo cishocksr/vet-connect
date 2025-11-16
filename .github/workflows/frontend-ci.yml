@@ -56,12 +56,11 @@ jobs:
         run: pnpm test:coverage:ci
         continue-on-error: true
 
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          name: frontend-coverage
-          path: apps/frontend/coverage/
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: cishocksr/vet-connect
 
   lint:
     name: Lint Check
