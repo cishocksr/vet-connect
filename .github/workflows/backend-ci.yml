@@ -61,13 +61,13 @@ jobs:
 
       - name: Archive test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: backend-test-results
           path: apps/backend/target/surefire-reports/
 
       - name: Archive coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: coverage-report
           path: apps/backend/target/site/jacoco/
@@ -94,7 +94,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: backend-jar
           path: apps/backend/target/*.jar
@@ -123,7 +123,7 @@ jobs:
 
       - name: Upload security report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: security-report
           path: apps/backend/target/dependency-check-report.html
