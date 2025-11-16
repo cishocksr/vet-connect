@@ -2,6 +2,7 @@ package com.vetconnect.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ import java.time.Duration;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnBean(RedisTemplate.class)
 public class RedisRateLimitService {
 
     private final RedisTemplate<String, String> redisTemplate;

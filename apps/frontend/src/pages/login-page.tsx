@@ -64,7 +64,7 @@ export default function LoginPage() {
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1 text-center">
                     <div className="flex justify-center mb-4">
-                        <div className="p-3 bg-military-navy rounded-full">
+                        <div style={{ backgroundColor: 'var(--color-primary)' }} className="p-3 rounded-full">
                             <Shield className="h-8 w-8 text-white" />
                         </div>
                     </div>
@@ -125,7 +125,8 @@ export default function LoginPage() {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full bg-military-navy hover:bg-military-navy/90 text-white"
+                            style={{ backgroundColor: 'var(--color-primary)' }}
+                            className="w-full hover:opacity-90 text-white"
                             disabled={isLoggingIn}
                         >
                             {isLoggingIn ? (

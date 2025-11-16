@@ -23,6 +23,10 @@ api.interceptors.request.use(
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('Request to:', config.url, 'with token:', token.substring(0, 20) + '...');
+        } else if (!config.url?.includes('/auth/')) {
+            // Only warn if it's not an auth endpoint (login/register don't need tokens)
+            console.warn('No token found in localStorage for request:', config.url);
         }
         return config;
     },

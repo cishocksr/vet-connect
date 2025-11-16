@@ -31,7 +31,7 @@ class SavedResourceService {
      * Update notes for saved resource
      */
     async updateNotes(savedResourceId: string, notes: string): Promise<SavedResource> {
-        const response = await api.put<ApiResponse<SavedResource>>(
+        const response = await api.patch<ApiResponse<SavedResource>>(
             `/saved/${savedResourceId}/notes`,
             { notes }
         );

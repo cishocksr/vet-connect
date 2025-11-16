@@ -77,7 +77,7 @@ export default function ProfilePage() {
                     {/* Edit Profile Button */}
                     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-military-navy hover:bg-military-navy/90 text-white">
+                            <Button style={{ backgroundColor: 'var(--color-primary)' }} className="hover:opacity-90 text-white">
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit Profile
                             </Button>
@@ -192,7 +192,8 @@ export default function ProfilePage() {
                                 {/* Save Button */}
                                 <Button
                                     onClick={handleSave}
-                                    className="w-full bg-military-navy hover:bg-military-navy/90 text-white"
+                                    style={{ backgroundColor: 'var(--color-primary)' }}
+                                    className="w-full hover:opacity-90 text-white"
                                     disabled={updateMutation.isPending}
                                 >
                                     {updateMutation.isPending ? (
@@ -240,7 +241,7 @@ export default function ProfilePage() {
                                 <Shield className="h-4 w-4" />
                                 Branch of Service
                             </label>
-                            <Badge className="mt-1 bg-military-green">
+                            <Badge style={{ backgroundColor: 'var(--color-primary)' }} className="mt-1 text-white">
                                 {user.branchDisplayName}
                             </Badge>
                         </div>

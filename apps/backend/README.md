@@ -2,9 +2,9 @@
 
 <div align="center">
 
-![Build Status](https://github.com/yourusername/vet-connect/workflows/Backend%20CI%2FCD/badge.svg)
-[![codecov](https://codecov.io/gh/yourusername/vet-connect/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/vet-connect)
-[![CodeQL](https://github.com/yourusername/vet-connect/workflows/CodeQL%20Security%20Scan/badge.svg)](https://github.com/yourusername/vet-connect/security/code-scanning)
+![Build Status](https://github.com/cishocksr/vet-connect/workflows/Backend%20CI%2FCD/badge.svg)
+[![codecov](https://codecov.io/gh/cishocksr/vet-connect/branch/main/graph/badge.svg)](https://codecov.io/gh/cishocksr/vet-connect)
+[![CodeQL](https://github.com/cishocksr/vet-connect/workflows/CodeQL%20Security%20Scan/badge.svg)](https://github.com/cishocksr/vet-connect/security/code-scanning)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vetconnect-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=vetconnect-backend)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen.svg)
 ![Java](https://img.shields.io/badge/Java-21-blue.svg)
@@ -171,7 +171,7 @@ docker --version # Should show Docker 20+
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/vet-connect.git
+git clone https://github.com/cishocksr/vet-connect.git
 cd vet-connect/apps/backend
 ```
 
@@ -769,7 +769,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 👥 Authors
 
-- **Christopher Shockley** - *Initial work* - [YourGitHub](https://github.com/yourusername)
+- **Christopher Shockley** - *Initial work* - [YourGitHub](https://github.com/cishocksr)
 
 ---
 
@@ -787,8 +787,8 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 If you encounter any issues or have questions:
 
 - 📧 Email: support@vetconnect.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/vet-connect/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/vet-connect/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/cishocksr/vet-connect/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/cishocksr/vet-connect/discussions)
 
 ---
 

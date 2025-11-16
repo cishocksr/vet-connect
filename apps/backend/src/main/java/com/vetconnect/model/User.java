@@ -95,6 +95,7 @@ public class User {
     private LocalDateTime deletedAt;
 
     @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
     private Boolean isDeleted = false;
 
     @Column(name = "suspended_at")

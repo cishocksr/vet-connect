@@ -4,6 +4,15 @@
 
     --color-background: #ffffff;
     --color-foreground: #1a1a1a;
+    
+    /* Dynamic theme colors - set by ThemeContext */
+    --color-primary: #1976d2;
+    --color-primary-dark: #115293;
+    --color-primary-light: #4791db;
+    --color-secondary: #dc004e;
+    --color-accent: #f50057;
+    --color-text: #000000;
+    
     /* Military Branch Colors */
     --color-military-army-green: #4a5d23;
     --color-military-army-gold: #d4af37;

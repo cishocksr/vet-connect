@@ -81,6 +81,8 @@ export default function RegisterPage() {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { confirmPassword, ...registerData } = data;
 
+            console.log('Sending registration data:', registerData);
+
             await registerUser(registerData as RegisterRequest, {
                 onSuccess: () => {
                     navigate('/dashboard');
@@ -89,9 +91,17 @@ export default function RegisterPage() {
         } catch (error: unknown) {
             console.error('Registration failed:', error);
 
+            // Log the full error details for debugging
+            if (error && typeof error === 'object' && 'response' in error) {
+                const axiosError = error as { response?: { data?: any; status?: number } };
+                console.error('Response status:', axiosError.response?.status);
+                console.error('Response data:', axiosError.response?.data);
+            }
+
             // Display error message to user
             const message = error && typeof error === 'object' && 'response' in error
-                ? (error.response as { data?: { message?: string } })?.data?.message
+                ? (error.response as { data?: { message?: string; validationErrors?: Record<string, string> } })?.data?.message ||
+                  JSON.stringify((error.response as { data?: { validationErrors?: Record<string, string> } })?.data?.validationErrors)
                 : error instanceof Error
                 ? error.message
                 : 'Registration failed. Please try again.';
@@ -106,7 +116,7 @@ export default function RegisterPage() {
             <Card className="w-full max-w-2xl">
                 <CardHeader className="space-y-1 text-center">
                     <div className="flex justify-center mb-4">
-                        <div className="p-3 bg-military-navy rounded-full">
+                        <div style={{ backgroundColor: 'var(--color-primary)' }} className="p-3 rounded-full">
                             <Shield className="h-8 w-8 text-white" />
                         </div>
                     </div>
@@ -305,7 +315,8 @@ export default function RegisterPage() {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full bg-military-navy hover:bg-military-navy/90 text-white font-medium"
+                            style={{ backgroundColor: 'var(--color-primary)' }}
+                            className="w-full hover:opacity-90 text-white font-medium"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? 'Creating Account...' : 'Create Account'}

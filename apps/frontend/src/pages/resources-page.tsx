@@ -131,7 +131,7 @@ export default function ResourcesPage() {
                                         className="pl-10"
                                     />
                                 </div>
-                                <Button onClick={handleSearch} className="bg-military-navy">
+                                <Button onClick={handleSearch} className="bg-military-navy text-white hover:bg-military-navy/90">
                                     Search
                                 </Button>
                             </div>

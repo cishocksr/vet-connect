@@ -1,31 +1,21 @@
-version: '3.8'
-
 services:
-# Redis for token blacklist
-redis:
-  image: redis:7-alpine
-  container_name: vet-connect-redis
-  restart: unless-stopped
-  ports:
-    - "${REDIS_PORT:-6379}:6379"
-  # Only add password if REDIS_PASSWORD is set
-  command: sh -c 'if [ -n "$$REDIS_PASSWORD" ]; then redis-server --requirepass "$$REDIS_PASSWORD"; else redis-server; fi'
-  environment:
-    - REDIS_PASSWORD=${REDIS_PASSWORD:-}
-  healthcheck:
-    test: >
-      sh -c '
-      if [ -n "$$REDIS_PASSWORD" ]; then
-        redis-cli -a "$$REDIS_PASSWORD" ping
-      else
-        redis-cli ping
-      fi
-      '
-    interval: 10s
-    timeout: 5s
-    retries: 5
-  networks:
-    - vet-connect-network
+  # Redis for token blacklist
+  redis:
+    image: redis:7-alpine
+    container_name: vet-connect-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-devpassword123}"]
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-devpassword123}
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD:-devpassword123}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vet-connect-network
 
   # PostgreSQL Database
   postgres:
@@ -33,15 +23,15 @@ redis:
     container_name: vet-connect-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-vet_connect}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword123}
+      POSTGRES_DB: ${POSTGRES_DB:?ERROR - POSTGRES_DB not set. Please add to .env file}
+      POSTGRES_USER: ${POSTGRES_USER:?ERROR - POSTGRES_USER not set. Please add to .env file}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?ERROR - POSTGRES_PASSWORD not set. Please add to .env file}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -58,38 +48,26 @@ redis:
     ports:
       - "8080:8080"
     environment:
-      # Spring Profile - CRITICAL for production
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
-
-      # Database configuration
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
-      POSTGRES_DB: ${POSTGRES_DB:-vet_connect}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-      # Redis configuration
+      POSTGRES_DB: ${POSTGRES_DB:?ERROR - POSTGRES_DB not set}
+      POSTGRES_USER: ${POSTGRES_USER:?ERROR - POSTGRES_USER not set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?ERROR - POSTGRES_PASSWORD not set}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-
-      # JPA/Hibernate
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-devpassword123}
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
       SPRING_JPA_SHOW_SQL: false
-
-      # Liquibase
       SPRING_LIQUIBASE_ENABLED: true
-
-      # JWT Secret (from environment variable)
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:?ERROR - JWT_SECRET not set. Generate with openssl rand -base64 64}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
       JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
-
-      # File upload
+      JWT_ISSUER_URI: ${JWT_ISSUER_URI:-http://localhost:8080}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?ERROR - CORS_ALLOWED_ORIGINS not set}
       FILE_UPLOAD_DIR: /app/uploads
-
-      # CORS (from environment variable)
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      MAX_FILE_SIZE: ${MAX_FILE_SIZE:-5242880}
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:-}
     volumes:
       - backend_uploads:/app/uploads
     depends_on:
@@ -98,11 +76,11 @@ redis:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     networks:
       - vet-connect-network
 
@@ -111,10 +89,14 @@ redis:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
+      args:
+        - API_BASE_URL=${API_BASE_URL:-http://localhost:8080/api}
     container_name: vet-connect-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:8080/api}
     depends_on:
       backend:
         condition: service_healthy
@@ -137,13 +119,16 @@ redis:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT:-5050}:80"
     depends_on:
       - postgres
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
       - vet-connect-network
+    profiles:
+      - dev
+      - tools
 
 volumes:
   postgres_data:

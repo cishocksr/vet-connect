@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test</title>
+    <style>
+        :root {
+            /* Default theme */
+            --color-primary: #1976d2;
+            --color-primary-dark: #115293;
+            --color-primary-light: #4791db;
+            --color-secondary: #dc004e;
+            --color-accent: #f50057;
+            --color-text: #000000;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--color-primary);
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--color-secondary);
+            color: white;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+
+        .color-display {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .color-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+        }
+
+        .color-info {
+            flex: 1;
+        }
+
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-value {
+            color: #666;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VetConnect Theme Tester</h1>
+        <p>Click a branch to see the color scheme change:</p>
+        
+        <div class="controls">
+            <button onclick="applyTheme('ARMY')">Army</button>
+            <button onclick="applyTheme('NAVY')">Navy</button>
+            <button onclick="applyTheme('AIR_FORCE')">Air Force</button>
+            <button onclick="applyTheme('MARINES')">Marines</button>
+            <button onclick="applyTheme('COAST_GUARD')">Coast Guard</button>
+            <button onclick="applyTheme('SPACE_FORCE')">Space Force</button>
+            <button onclick="applyTheme('default')">Default</button>
+        </div>
+
+        <div class="badge">Example Badge</div>
+
+        <div class="color-display">
+            <div class="color-box">
+                <div class="color-swatch" id="primary-swatch"></div>
+                <div class="color-info">
+                    <div class="color-name">Primary</div>
+                    <div class="color-value" id="primary-value"></div>
+                </div>
+            </div>
+            <div class="color-box">
+                <div class="color-swatch" id="secondary-swatch"></div>
+                <div class="color-info">
+                    <div class="color-name">Secondary</div>
+                    <div class="color-value" id="secondary-value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const branchThemes = {
+            ARMY: {
+                primary: '#000000',
+                primaryDark: '#1a1a1a',
+                primaryLight: '#333333',
+                secondary: '#FFD700',
+                accent: '#FDB913',
+                text: '#000000',
+            },
+            NAVY: {
+                primary: '#000080',
+                primaryDark: '#00005a',
+                primaryLight: '#1a1a9e',
+                secondary: '#FFD700',
+                accent: '#FDB913',
+                text: '#000080',
+            },
+            AIR_FORCE: {
+                primary: '#00308F',
+                primaryDark: '#002366',
+                primaryLight: '#1a4ca8',
+                secondary: '#FFD700',
+                accent: '#B0BEC5',
+                text: '#00308F',
+            },
+            MARINES: {
+                primary: '#CC0000',
+                primaryDark: '#990000',
+                primaryLight: '#e61a1a',
+                secondary: '#FFD700',
+                accent: '#B8860B',
+                text: '#CC0000',
+            },
+            COAST_GUARD: {
+                primary: '#0000FF',
+                primaryDark: '#0000cc',
+                primaryLight: '#1a1aff',
+                secondary: '#FF0000',
+                accent: '#FFD700',
+                text: '#0000FF',
+            },
+            SPACE_FORCE: {
+                primary: '#1C2A5A',
+                primaryDark: '#0f1829',
+                primaryLight: '#2a3f6f',
+                secondary: '#FFFFFF',
+                accent: '#C0C0C0',
+                text: '#FFFFFF',
+            },
+            default: {
+                primary: '#1976d2',
+                primaryDark: '#115293',
+                primaryLight: '#4791db',
+                secondary: '#dc004e',
+                accent: '#f50057',
+                text: '#000000',
+            }
+        };
+
+        function applyTheme(branch) {
+            const theme = branchThemes[branch];
+            const root = document.documentElement;
+            
+            root.style.setProperty('--color-primary', theme.primary);
+            root.style.setProperty('--color-primary-dark', theme.primaryDark);
+            root.style.setProperty('--color-primary-light', theme.primaryLight);
+            root.style.setProperty('--color-secondary', theme.secondary);
+            root.style.setProperty('--color-accent', theme.accent);
+            root.style.setProperty('--color-text', theme.text);
+            
+            updateColorDisplay();
+        }
+
+        function updateColorDisplay() {
+            const primary = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
+            const secondary = getComputedStyle(document.documentElement).getPropertyValue('--color-secondary').trim();
+            
+            document.getElementById('primary-swatch').style.backgroundColor = primary;
+            document.getElementById('primary-value').textContent = primary;
+            document.getElementById('secondary-swatch').style.backgroundColor = secondary;
+            document.getElementById('secondary-value').textContent = secondary;
+        }
+
+        // Initialize
+        updateColorDisplay();
+    </script>
+</body>
+</html>

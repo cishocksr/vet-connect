@@ -10,6 +10,8 @@ jobs:
     name: Full Integration Test Suite
     runs-on: ubuntu-latest
 
+    # Note: Tests use H2 in-memory database and mock Redis services
+    # These services are provided for potential future integration tests
     services:
       postgres:
         image: postgres:15-alpine
@@ -54,6 +56,16 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
         run: mvn clean verify
+
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            apps/backend/target/surefire-reports/
+            apps/backend/target/failsafe-reports/
+          retention-days: 30
 
       - name: Generate comprehensive report
         working-directory: ./apps/backend

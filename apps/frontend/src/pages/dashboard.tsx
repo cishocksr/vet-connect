@@ -151,16 +151,16 @@ export default function DashboardPage() {
                                             <div className="flex-1">
                                                 <div className="flex flex-wrap gap-2 mb-2">
                                                     <Badge variant="secondary">
-                                                        {saved.resource.category.name}
+                                                        {saved.resource.categoryName}
                                                     </Badge>
                                                     {saved.resource.isNational ? (
-                                                        <Badge className="bg-military-gold text-white text-xs">
+                                                        <Badge style={{ backgroundColor: 'var(--color-secondary)' }} className="text-white text-xs">
                                                             <Globe className="h-3 w-3 mr-1" />
                                                             National
                                                         </Badge>
-                                                    ) : saved.resource.state && (
+                                                    ) : saved.resource.locationDisplay && (
                                                         <Badge variant="outline" className="text-xs">
-                                                            {saved.resource.state}
+                                                            {saved.resource.locationDisplay}
                                                         </Badge>
                                                     )}
                                                 </div>
@@ -209,7 +209,8 @@ export default function DashboardPage() {
                                                             />
                                                             <Button
                                                                 onClick={() => handleUpdateNotes(saved.id)}
-                                                                className="w-full bg-military-navy hover:bg-military-navy/90 text-white"
+                                                                style={{ backgroundColor: 'var(--color-primary)' }}
+                                                                className="w-full hover:opacity-90 text-white"
                                                                 disabled={updateNotesMutation.isPending}
                                                             >
                                                                 {updateNotesMutation.isPending ? (
@@ -333,7 +334,7 @@ export default function DashboardPage() {
                         <p className="text-gray-600 mb-4">
                         Start exploring and save resources to your dashboard for quick access
                         </p>
-                            <Button asChild className="bg-military-navy hover:bg-military-navy/90 text-white">
+                            <Button asChild style={{ backgroundColor: 'var(--color-primary)' }} className="hover:opacity-90 text-white">
                                 <Link to="/resources">
                                     <Search className="h-4 w-4 mr-2" />
                                     Browse Resources

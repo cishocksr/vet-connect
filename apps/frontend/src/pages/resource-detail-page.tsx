@@ -11,6 +11,8 @@ import { useAuth } from '../hooks/use-auth.ts';
 import resourceService from '../services/resource-service.ts';
 import savedResourceService from '../services/saved-resource-service.ts';
 import { formatPhoneNumber } from '../lib/utils';
+import { toast } from '../hooks/use-toast';
+import { AuthDebug } from '../components/debug/auth-debug';
 import {
     MapPin,
     Globe,
@@ -55,8 +57,28 @@ export default function ResourceDetailPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['saved'] });
             queryClient.invalidateQueries({ queryKey: ['saved', 'check', id] });
+            queryClient.invalidateQueries({ queryKey: ['saved', 'resources'] });
             setIsDialogOpen(false);
             setNotes('');
+            toast.success('Resource saved to dashboard!');
+        },
+        onError: (error: any) => {
+            console.error('Save error:', error);
+            console.error('Error response:', error?.response);
+            console.error('Error status:', error?.response?.status);
+            console.error('Error data:', error?.response?.data);
+            
+            let errorMessage = 'Failed to save resource. Please try again.';
+            
+            if (error?.response?.status === 403) {
+                errorMessage = 'Access denied. Please log out and log back in.';
+                console.error('403 Forbidden - Token may be invalid or expired');
+                console.error('Token in localStorage:', localStorage.getItem('token')?.substring(0, 20) + '...');
+            } else if (error?.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+            
+            toast.error(errorMessage);
         },
     });
 
@@ -68,6 +90,7 @@ export default function ResourceDetailPage() {
             return;
         }
 
+        console.log('Saving resource:', { resourceId: id, notes: notes || undefined });
         saveMutation.mutate({ resourceId: id, notes: notes || undefined });
     };
 
@@ -106,6 +129,8 @@ export default function ResourceDetailPage() {
     }
 
     return (
+        <>
+        <AuthDebug />
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="container mx-auto px-4 max-w-4xl">
                 {/* Back Button */}
@@ -301,8 +326,9 @@ export default function ResourceDetailPage() {
             View All {resource.category.name} Resources
         </Link>
     </Button>
-</div>
-</div>
-</div>
-);
+                </div>
+            </div>
+        </div>
+        </>
+    );
 }

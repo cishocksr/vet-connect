@@ -28,11 +28,18 @@ class AuthService {
      * Login user
      */
     async login(data: LoginRequest): Promise<AuthResponse> {
-        const response = await api.post<ApiResponse<AuthResponse>>(
-            '/auth/login',
-            data
-        );
-        return response.data.data;
+        console.log('Attempting login with email:', data.email);
+        try {
+            const response = await api.post<ApiResponse<AuthResponse>>(
+                '/auth/login',
+                data
+            );
+            console.log('Login successful');
+            return response.data.data;
+        } catch (error: any) {
+            console.error('Login failed:', error?.response?.status, error?.response?.data);
+            throw error;
+        }
     }
 
     /**

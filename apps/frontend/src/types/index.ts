@@ -73,13 +73,14 @@ export interface Resource {
 
 export interface ResourceSummary {
     id: string;
-    categoryId: number;
-    categoryName: string;
     name: string;
     shortDescription: string;
-    city?: string;
-    state?: string;
+    categoryName: string;
+    categoryIconName: string;
+    locationDisplay: string;
     isNational: boolean;
+    phoneNumber?: string;
+    websiteUrl?: string;
 }
 
 export interface ResourceCategory {
@@ -97,9 +98,11 @@ export interface ResourceCategoryWithCount extends ResourceCategory {
 
 export interface SavedResource {
     id: string;
-    resource: Resource;
+    resource: ResourceSummary;
     notes?: string;
+    hasNotes: boolean;
     savedAt: string;
+    formattedSavedDate?: string;
 }
 
 export interface SaveResourceRequest {

@@ -31,7 +31,10 @@ export function Navbar() {
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.3 }}
-            className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-military-navy via-military-air-force-blue to-military-navy shadow-lg"
+            style={{ 
+                background: `linear-gradient(to right, var(--color-primary-dark), var(--color-primary), var(--color-primary-dark))`
+            }}
+            className="sticky top-0 z-50 w-full border-b shadow-lg"
         >
             <div className="container mx-auto px-4">
                 <div className="flex h-16 items-center justify-between">
@@ -154,7 +157,8 @@ export function Navbar() {
                                 </Button>
                                 <Button
                                     onClick={() => navigate('/register')}
-                                    className="bg-military-gold hover:bg-military-army-gold text-military-navy font-semibold"
+                                    style={{ backgroundColor: 'var(--color-secondary)' }}
+                                    className="hover:opacity-90 text-white font-semibold"
                                 >
                                     Sign Up
                                 </Button>

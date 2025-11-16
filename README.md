@@ -6,9 +6,9 @@
 
 **Connecting U.S. Veterans with Essential Resources**
 
-[![Build Status](https://github.com/cishocksr/vetconnect/workflows/CI/badge.svg)](https://github.com/yourusername/vetconnect/actions)
+[![Build Status](https://github.com/cishocksr/vetconnect/workflows/CI/badge.svg)](https://github.com/cishocksr/vetconnect/actions)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/yourusername/vetconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/cishockst/vetconnect)
+[![codecov](https://codecov.io/gh/cishocksr/vetconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/cishockst/vetconnect)
 
 [Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](#contributing)
 
@@ -72,7 +72,7 @@ Veterans often struggle to navigate the complex landscape of available resources
 ### Local Development
 ```bash
 # 1. Clone repository
-git clone https://github.com/yourusername/vetconnect.git
+git clone https://github.com/cishocksr/vetconnect.git
 cd vetconnect
 
 # 2. Set up environment variables
@@ -207,8 +207,8 @@ Built with dedication to serve those who served. Thank you to all U.S. military 
 
 ## 📧 Contact
 
-- Project Repository: [https://github.com/yourusername/vetconnect](https://github.com/yourusername/vetconnect)
-- Report Issues: [https://github.com/yourusername/vetconnect/issues](https://github.com/yourusername/vetconnect/issues)
+- Project Repository: [https://github.com/cishocksr/vetconnect](https://github.com/cishocksr/vetconnect)
+- Report Issues: [https://github.com/cishocksr/vetconnect/issues](https://github.com/cishocksr/vetconnect/issues)
 
 ---
 

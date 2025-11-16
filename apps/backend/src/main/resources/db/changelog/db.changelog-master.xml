@@ -13,6 +13,7 @@
     <include file="db/changelog/changes/006-insert-sample-resources.xml"/>
     <include file="db/changelog/changes/007-add-profile-picture-to-users.xml"/>
     <include file="db/changelog/changes/008-add-user-status-fields.xml"/>
-    <include file="db/changelog/changes/009-add-token-version-to-users.xml"/>  <!-- ADD THIS LINE -->
+    <include file="db/changelog/changes/009-add-token-version-to-users.xml"/>
+    <include file="db/changelog/changes/010-add-soft-delete-to-users.xml"/>
 
 </databaseChangeLog>
