@@ -1,4 +1,5 @@
 import api from './api';
+import { AxiosError } from 'axios';
 import type {
     AuthResponse,
     LoginRequest,
@@ -36,8 +37,10 @@ class AuthService {
             );
             console.log('Login successful');
             return response.data.data;
-        } catch (error: any) {
-            console.error('Login failed:', error?.response?.status, error?.response?.data);
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                console.error('Login failed:', error?.response?.status, error?.response?.data);
+            }
             throw error;
         }
     }

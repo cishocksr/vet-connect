@@ -11,6 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useAuth } from '@/hooks/use-auth.ts';
 import { Shield } from 'lucide-react';
 import type { RegisterRequest, BranchOfService } from '@/types';
+import { AxiosError } from 'axios';
+
+interface AxiosErrorResponseData {
+    message?: string;
+    validationErrors?: Record<string, string>;
+}
 
 // Register form validation schema
 const registerSchema = z.object({
@@ -92,16 +98,16 @@ export default function RegisterPage() {
             console.error('Registration failed:', error);
 
             // Log the full error details for debugging
-            if (error && typeof error === 'object' && 'response' in error) {
-                const axiosError = error as { response?: { data?: any; status?: number } };
+            if (error instanceof AxiosError && error.response) {
+                const axiosError = error as AxiosError<AxiosErrorResponseData>;
                 console.error('Response status:', axiosError.response?.status);
                 console.error('Response data:', axiosError.response?.data);
             }
 
             // Display error message to user
-            const message = error && typeof error === 'object' && 'response' in error
-                ? (error.response as { data?: { message?: string; validationErrors?: Record<string, string> } })?.data?.message ||
-                  JSON.stringify((error.response as { data?: { validationErrors?: Record<string, string> } })?.data?.validationErrors)
+            const message = error instanceof AxiosError && error.response
+                ? error.response.data?.message ||
+                  JSON.stringify(error.response.data?.validationErrors)
                 : error instanceof Error
                 ? error.message
                 : 'Registration failed. Please try again.';

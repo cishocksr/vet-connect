@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -62,7 +63,7 @@ export default function ResourceDetailPage() {
             setNotes('');
             toast.success('Resource saved to dashboard!');
         },
-        onError: (error: any) => {
+        onError: (error: AxiosError<{ message?: string }>) => {
             console.error('Save error:', error);
             console.error('Error response:', error?.response);
             console.error('Error status:', error?.response?.status);
