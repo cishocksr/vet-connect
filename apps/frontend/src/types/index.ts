@@ -74,6 +74,10 @@ export interface Resource {
 export interface ResourceSummary {
     id: string;
     name: string;
+    email?: string;
+    city: string;
+    state: string;
+    description: string;
     shortDescription: string;
     categoryName: string;
     categoryIconName: string;
