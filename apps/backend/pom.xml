@@ -26,7 +26,7 @@
         <byte-buddy.version>1.15.11</byte-buddy.version>
         <liquibase.version>4.30.0</liquibase.version>
         <springdoc.version>2.7.0</springdoc.version>
-        <jjwt.version>0.12.5</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
     </properties>
 
     <dependencies>
