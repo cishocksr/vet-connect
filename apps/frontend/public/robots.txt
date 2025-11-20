@@ -1,0 +1,11 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /profile
+
+# Sitemap location
+Sitemap: https://vetconnect.com/sitemap.xml

@@ -91,7 +91,6 @@ export default function ResourceDetailPage() {
             return;
         }
 
-        console.log('Saving resource:', { resourceId: id, notes: notes || undefined });
         saveMutation.mutate({ resourceId: id, notes: notes || undefined });
     };
 

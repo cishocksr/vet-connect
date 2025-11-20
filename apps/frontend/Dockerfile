@@ -31,18 +31,6 @@ COPY --from=build /app/dist .
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-# Stage 2: Production with nginx
-FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
-
-# Remove default nginx static assets
-RUN rm -rf ./*
-
-# Copy built app from build stage
-COPY --from=build /app/dist .
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh /docker-entrypoint.sh

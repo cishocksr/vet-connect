@@ -4,6 +4,7 @@ import { Footer } from './components/layout/footer.tsx';
 import { ProtectedRoute } from './components/auth/protected-route.tsx';
 import { ScrollToTop } from './components/layout/scroll-to-top.tsx';
 import {Toaster} from "./components/ui/sonner.tsx";
+import { StructuredData, organizationSchema, websiteSchema } from './components/seo/structured-data.tsx';
 
 // Pages (we'll create these next)
 import HomePage from './pages/home-page';
@@ -23,6 +24,8 @@ function App() {
     return (
         <div className="flex flex-col min-h-screen">
             <ScrollToTop />
+            <StructuredData data={organizationSchema} />
+            <StructuredData data={websiteSchema} />
 
             <Navbar />
             <main className="flex-1">

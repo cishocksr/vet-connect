@@ -87,7 +87,6 @@ export default function RegisterPage() {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { confirmPassword, ...registerData } = data;
 
-            console.log('Sending registration data:', registerData);
 
             await registerUser(registerData as RegisterRequest, {
                 onSuccess: () => {

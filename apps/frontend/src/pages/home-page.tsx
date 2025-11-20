@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
 import resourceService from '@/services/resource-service';
 import { useAuth } from '@/hooks/use-auth';
+import { MetaTags } from '@/components/seo/meta-tags';
 import {
     Shield,
     Home,
@@ -50,6 +51,10 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen">
+            <MetaTags 
+                title="Home"
+                description="VetConnect - Your comprehensive resource hub for housing, healthcare, education, and support services. Built for veterans, by veterans."
+            />
             {/* Hero Section */}
             <section className="relative bg-gradient-to-br from-military-navy via-military-air-force-blue to-military-space-force-blue text-white py-20 overflow-hidden">
                 {/* Animated background pattern */}
