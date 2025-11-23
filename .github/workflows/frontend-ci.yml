@@ -60,7 +60,10 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: cishocksr/vet-connect
+          files: ./apps/frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
 
   lint:
     name: Lint Check

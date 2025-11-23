@@ -52,9 +52,10 @@ jobs:
         run: mvn jacoco:report
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
-          file: ./apps/backend/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./apps/backend/target/site/jacoco/jacoco.xml
           flags: backend
           name: backend-coverage
           fail_ci_if_error: false
