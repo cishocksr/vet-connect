@@ -60,10 +60,11 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./apps/frontend/coverage/coverage-final.json
+          files: ./apps/frontend/coverage/lcov.info
           flags: frontend
           name: frontend-coverage
           fail_ci_if_error: false
+          verbose: true
 
   lint:
     name: Lint Check
