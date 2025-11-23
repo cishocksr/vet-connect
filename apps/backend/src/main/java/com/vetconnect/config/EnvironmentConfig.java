@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -12,10 +13,13 @@ import org.springframework.validation.annotation.Validated;
  *
  * Validates all critical environment variables at application startup
  * to fail fast if configuration is invalid
+ *
+ * NOTE: This config is skipped during tests (test profile)
  */
 @Configuration
 @Validated
 @Slf4j
+@Profile("!test")  // Don't load this config when running tests
 public class EnvironmentConfig {
 
     @NotEmpty(message = "JWT_SECRET must be set")
