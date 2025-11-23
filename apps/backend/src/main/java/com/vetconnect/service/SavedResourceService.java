@@ -9,11 +9,13 @@ import com.vetconnect.model.SavedResource;
 import com.vetconnect.model.User;
 import com.vetconnect.repository.SavedResourcesRepository;
 import com.vetconnect.util.InputSanitizer;
+import com.vetconnect.util.XssProtection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +40,7 @@ public class SavedResourceService {
     private final UserService userService;
     private final ResourceService resourceService;
     private final InputSanitizer inputSanitizer;
+    private final XssProtection xssProtection;
 
     // ========== READ OPERATIONS ==========
 
@@ -142,15 +145,15 @@ public class SavedResourceService {
         }
 
         // Sanitize notes if provided
-        String sanitizedNotes = saveRequest.getNotes() != null
-                ? inputSanitizer.sanitizeHtml(saveRequest.getNotes())
-                : null;
+        String sanitizedNotes = xssProtection.sanitize(saveRequest.getNotes());
+
 
         // Create saved resource
         SavedResource savedResource = SavedResource.builder()
                 .user(user)
                 .resource(resource)
-                .notes(sanitizedNotes)  // Use sanitized notes
+                .notes(sanitizedNotes)
+                .savedAt(LocalDateTime.now())
                 .build();
 
         SavedResource saved = savedResourcesRepository.save(savedResource);

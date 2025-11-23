@@ -41,4 +41,18 @@ public class InputSanitizer {
         }
         return Encode.forJavaScript(input);
     }
+
+    /**
+     * Sanitize general text input
+     * Removes potentially dangerous patterns
+     * Use this for notes, descriptions, etc.
+     */
+    public String sanitize(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        // Use OWASP encoder for HTML content
+        return Encode.forHtml(input);
+    }
 }
