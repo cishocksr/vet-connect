@@ -17,7 +17,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * Security: Enables server-side token revocation
  */
 @Configuration
-@ConditionalOnProperty(name = "spring.data.redis.host", matchIfMissing = false)
+@ConditionalOnProperty(name = "spring.data.redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")

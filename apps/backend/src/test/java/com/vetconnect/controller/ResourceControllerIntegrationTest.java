@@ -6,23 +6,18 @@ import com.vetconnect.dto.resource.CreateResourceRequest;
 import com.vetconnect.model.ResourceCategory;
 import com.vetconnect.model.enums.BranchOfService;
 import com.vetconnect.repository.ResourceCategoryRepository;
-import com.vetconnect.service.RedisRateLimitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -47,17 +42,11 @@ class ResourceControllerIntegrationTest {
     @Autowired
     private ResourceCategoryRepository categoryRepository;
 
-    @MockBean
-    private RedisRateLimitService rateLimitService;
-
     private String authToken;
     private Integer categoryId;
 
     @BeforeEach
     void setUp() throws Exception {
-        // Disable rate limiting for tests
-        when(rateLimitService.allowRegisterAttempt(anyString())).thenReturn(true);
-        when(rateLimitService.allowLoginAttempt(anyString())).thenReturn(true);
 
         // Create a category for testing
         ResourceCategory category = ResourceCategory.builder()

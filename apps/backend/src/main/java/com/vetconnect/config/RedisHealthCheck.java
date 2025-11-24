@@ -2,6 +2,7 @@ package com.vetconnect.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,10 +15,13 @@ import java.util.concurrent.TimeUnit;
  *
  * Verifies Redis connection at application startup
  * Fails fast if Redis is unavailable
+ * 
+ * Only runs when Redis is configured (RedisTemplate bean exists)
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnBean(RedisTemplate.class)
 public class RedisHealthCheck implements ApplicationListener<ApplicationReadyEvent> {
 
     private final RedisTemplate<String, String> redisTemplate;

@@ -1,13 +1,11 @@
 package com.vetconnect.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Token Blacklist Service
@@ -20,15 +18,26 @@ import java.util.concurrent.TimeUnit;
  * - We store blacklisted tokens with expiration matching JWT expiration
  * - When a token is checked, if it exists in Redis, it's invalid
  * - Tokens automatically removed from Redis after expiration (saves memory)
+ * 
+ * FALLBACK MODE:
+ * - When Redis is not available (tests), this service operates in no-op mode
+ * - All blacklist operations are skipped, tokens are never blacklisted
+ * - This is acceptable for testing but NOT for production
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
-@ConditionalOnBean(RedisTemplate.class)
 public class TokenBlacklistService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private static final String BLACKLIST_PREFIX = "blacklist:token:";
+
+    public TokenBlacklistService(@Autowired(required = false) RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+        if (redisTemplate == null) {
+            log.warn("⚠️  TokenBlacklistService initialized without Redis - token blacklisting is DISABLED. " +
+                    "This should only occur in test environments.");
+        }
+    }
 
     /**
      * Add a token to the blacklist
@@ -37,6 +46,10 @@ public class TokenBlacklistService {
      * @param expirationMs Time until token naturally expires (in milliseconds)
      */
     public void blacklistToken(String token, long expirationMs) {
+        if (redisTemplate == null) {
+            log.debug("Token blacklist skipped (Redis not available)");
+            return;
+        }
         try {
             String key = BLACKLIST_PREFIX + token;
             // Store token with TTL matching its natural expiration
@@ -61,6 +74,9 @@ public class TokenBlacklistService {
      * @return true if token is blacklisted, false otherwise
      */
     public boolean isTokenBlacklisted(String token) {
+        if (redisTemplate == null) {
+            return false; // No Redis, no blacklisting
+        }
         try {
             String key = BLACKLIST_PREFIX + token;
             Boolean exists = redisTemplate.hasKey(key);
@@ -79,6 +95,9 @@ public class TokenBlacklistService {
      * @param token JWT token to remove from blacklist
      */
     public void removeFromBlacklist(String token) {
+        if (redisTemplate == null) {
+            return;
+        }
         try {
             String key = BLACKLIST_PREFIX + token;
             redisTemplate.delete(key);
@@ -99,6 +118,10 @@ public class TokenBlacklistService {
      * @param expirationMs Expiration time in milliseconds
      */
     public void blacklistAllUserTokens(String userId, long expirationMs) {
+        if (redisTemplate == null) {
+            log.debug("User token blacklist skipped (Redis not available): {}", userId);
+            return;
+        }
         try {
             String key = BLACKLIST_PREFIX + "user:" + userId;
             redisTemplate.opsForValue().set(
@@ -119,6 +142,9 @@ public class TokenBlacklistService {
      * @return true if all user tokens are blacklisted
      */
     public boolean areAllUserTokensBlacklisted(String userId) {
+        if (redisTemplate == null) {
+            return false; // No Redis, no blacklisting
+        }
         try {
             String key = BLACKLIST_PREFIX + "user:" + userId;
             Boolean exists = redisTemplate.hasKey(key);

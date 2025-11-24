@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,11 +29,15 @@ import java.util.concurrent.TimeUnit;
  * - Returns 429 Too Many Requests when limit exceeded
  *
  * ORDER: Runs early in filter chain (Order = 1)
+ * 
+ * NOTE: Only active when Redis is available (production)
+ * In test environments without Redis, this filter is not created
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnBean(RedisTemplate.class)
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private final RedisTemplate<String, String> redisTemplate;

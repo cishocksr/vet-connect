@@ -20,6 +20,12 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  # Disable Redis completely for tests
+  # This prevents RedisConfig bean from being created
+  data:
+    redis:
+      enabled: false
+
   # Disable Redis auto-configuration for tests
   # Tests will mock Redis-dependent services instead
   autoconfigure:

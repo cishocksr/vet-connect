@@ -7,14 +7,13 @@ import com.vetconnect.dto.auth.RegisterRequest;
 import com.vetconnect.dto.common.ApiResponse;
 import com.vetconnect.exception.RateLimitException;
 import com.vetconnect.service.AuthService;
-import com.vetconnect.service.RateLimitService;
 import com.vetconnect.service.RedisRateLimitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,14 +35,48 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Authentication", description = "User authentication endpoints")
 public class AuthController {
 
     private final AuthService authService;
-    private final RedisRateLimitService rateLimitService;
     private final TrustedProxyConfig trustedProxyConfig;
+    
+    // Rate limit service interface that works with both Redis and in-memory implementations
+    private final RateLimitServiceAdapter rateLimitService;
+
+    public AuthController(
+            AuthService authService,
+            TrustedProxyConfig trustedProxyConfig,
+            @Autowired(required = false) RedisRateLimitService redisRateLimitService) {
+        this.authService = authService;
+        this.trustedProxyConfig = trustedProxyConfig;
+        this.rateLimitService = new RateLimitServiceAdapter(redisRateLimitService);
+    }
+
+    /**
+     * Adapter to provide a unified interface for rate limiting
+     * Supports both Redis-based and no-op implementations
+     */
+    private static class RateLimitServiceAdapter {
+        private final RedisRateLimitService redisService;
+
+        RateLimitServiceAdapter(RedisRateLimitService redisService) {
+            this.redisService = redisService;
+        }
+
+        boolean allowLoginAttempt(String ipAddress) {
+            return redisService == null || redisService.allowLoginAttempt(ipAddress);
+        }
+
+        boolean allowRegisterAttempt(String ipAddress) {
+            return redisService == null || redisService.allowRegisterAttempt(ipAddress);
+        }
+
+        long getRemainingLoginAttempts(String ipAddress) {
+            return redisService != null ? redisService.getRemainingLoginAttempts(ipAddress) : Long.MAX_VALUE;
+        }
+    }
 
     /**
      * Register a new user
