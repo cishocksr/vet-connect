@@ -87,7 +87,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -104,7 +104,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ./apps/frontend/coverage/coverage-final.json
+          directory: ./apps/frontend/coverage/
           flags: frontend
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -144,6 +144,9 @@ jobs:
 
       - name: Build frontend
         run: pnpm build
+        env:
+          VITE_API_BASE_URL: http://localhost:8080/api
+          VITE_ENVIRONMENT: ci
 
   code-quality:
     name: Code Quality

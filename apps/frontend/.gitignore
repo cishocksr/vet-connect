@@ -10,8 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-*.local
 lighthouse-reports
+coverage
+
+# Environment files - ONLY commit .env.example
+.env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*

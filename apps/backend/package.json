@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "mvn test",
+    "test:ci": "mvn clean verify -Ptest",
+    "test:coverage": "mvn clean verify -Ptest",
+    "test:coverage:ci": "mvn clean verify -Ptest",
+    "build": "mvn clean package -DskipTests"
+  }
+}
