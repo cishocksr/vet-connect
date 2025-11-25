@@ -3,6 +3,7 @@ import { type ReactElement, type ReactNode, type JSX } from 'react'
 import { render, type RenderOptions, renderHook, type RenderHookOptions } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider } from '@/contexts/theme-context'
 
 interface AllTheProvidersProps {
     children: ReactNode
@@ -20,7 +21,9 @@ const AllTheProviders = ({ children }: AllTheProvidersProps): JSX.Element => {
     return (
         <QueryClientProvider client={testQueryClient}>
             <BrowserRouter>
-                <>{children}</>
+                <ThemeProvider>
+                    <>{children}</>
+                </ThemeProvider>
             </BrowserRouter>
         </QueryClientProvider>
     )

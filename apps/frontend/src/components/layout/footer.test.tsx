@@ -22,8 +22,9 @@ describe('Footer', () => {
     it('should contain VetConnect branding', () => {
         render(<Footer />);
 
-        const branding = screen.getByText(/vetconnect/i);
-        expect(branding).toBeInTheDocument();
+        const branding = screen.getAllByText(/vetconnect/i);
+        expect(branding.length).toBeGreaterThan(0);
+        expect(branding[0]).toBeInTheDocument();
     });
 
     it('should have proper footer structure', () => {
@@ -37,11 +38,12 @@ describe('Footer', () => {
     it('should display veterans-focused messaging', () => {
         render(<Footer />);
 
-        // Look for veteran-related text
-        const veteranText = screen.queryByText(/veteran/i) ||
-            screen.queryByText(/service member/i) ||
-            screen.queryByText(/military/i);
+        // Look for veteran-related text - use getAllByText for multiple matches
+        const veteranTexts = screen.queryAllByText(/veteran/i);
+        const serviceMemberTexts = screen.queryAllByText(/service member/i);
+        const militaryTexts = screen.queryAllByText(/military/i);
 
-        expect(veteranText).toBeTruthy();
+        const hasVeteranFocus = veteranTexts.length > 0 || serviceMemberTexts.length > 0 || militaryTexts.length > 0;
+        expect(hasVeteranFocus).toBeTruthy();
     });
 });

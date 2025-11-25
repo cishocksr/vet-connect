@@ -35,11 +35,12 @@ describe('HomePage', () => {
     it('should have call-to-action buttons', () => {
         render(<HomePage />);
 
-        // Look for primary CTA buttons
-        const ctaButton = screen.queryByRole('link', { name: /browse resources|explore|get started/i }) ||
-            screen.queryByRole('button', { name: /browse resources|explore|get started/i });
+        // Look for primary CTA buttons - may have multiple
+        const ctaLinks = screen.queryAllByRole('link', { name: /browse resources|explore|get started/i });
+        const ctaButtons = screen.queryAllByRole('button', { name: /browse resources|explore|get started/i });
 
-        expect(ctaButton).toBeTruthy();
+        const hasCTA = ctaLinks.length > 0 || ctaButtons.length > 0;
+        expect(hasCTA).toBeTruthy();
     });
 
     it('should render navigation links to key sections', () => {

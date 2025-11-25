@@ -39,3 +39,19 @@ globalThis.ResizeObserver = class ResizeObserver {
     unobserve = vi.fn()
     disconnect = vi.fn()
 } as unknown as typeof ResizeObserver
+
+// Mock scrollIntoView for Radix UI Select
+Element.prototype.scrollIntoView = vi.fn()
+
+// Mock hasPointerCapture for Radix UI Select
+if (typeof Element.prototype.hasPointerCapture === 'undefined') {
+    Element.prototype.hasPointerCapture = vi.fn(() => false)
+}
+
+// Mock setPointerCapture and releasePointerCapture
+if (typeof Element.prototype.setPointerCapture === 'undefined') {
+    Element.prototype.setPointerCapture = vi.fn()
+}
+if (typeof Element.prototype.releasePointerCapture === 'undefined') {
+    Element.prototype.releasePointerCapture = vi.fn()
+}
