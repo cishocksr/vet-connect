@@ -184,13 +184,14 @@ export default function RegisterPage() {
                         </div>
 
                         {/* Branch of Service */}
-                        {/* Branch of Service */}
                         <div className="space-y-2">
                             <Label htmlFor="branchOfService">Branch of Service *</Label>
                             <Select
                                 onValueChange={(value) => setValue('branchOfService', value)}
                             >
                                 <SelectTrigger
+                                    id="branchOfService"
+                                    aria-label="Branch of Service"
                                     className={`bg-white ${errors.branchOfService ? 'border-red-500' : ''}`}
                                 >
                                     <SelectValue placeholder="Select your branch" />

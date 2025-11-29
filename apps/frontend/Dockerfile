@@ -17,17 +17,21 @@ RUN pnpm install --frozen-lockfile
 COPY apps/frontend ./apps/frontend
 COPY turbo.json ./
 
-# Build argument for environment
-ARG BUILD_ENV=production
-ENV NODE_ENV=production
+# Build arguments for environment variables
+ARG VITE_API_BASE_URL
+ARG VITE_APP_NAME
+ARG VITE_ENVIRONMENT
+ARG VITE_ENABLE_ANALYTICS
 
-# Build the application with environment-specific config
+# Set environment variables for build
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_ENVIRONMENT=$VITE_ENVIRONMENT
+ENV VITE_ENABLE_ANALYTICS=$VITE_ENABLE_ANALYTICS
+
+# Build the application
 WORKDIR /app/apps/frontend
-RUN if [ "$BUILD_ENV" = "staging" ]; then \
-      pnpm build --mode staging; \
-    else \
-      pnpm build --mode production; \
-    fi
+RUN pnpm build
 
 # Production stage
 FROM nginx:alpine
