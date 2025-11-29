@@ -2,9 +2,10 @@ name: PR Checks
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, staging ]
 
 jobs:
+  # Validation checks
   validate:
     name: Validate PR
     runs-on: ubuntu-latest
@@ -12,6 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check for merge conflicts
         run: |
@@ -25,8 +28,9 @@ jobs:
       # - name: Validate commit messages
       #   uses: wagoid/commitlint-github-action@v5
 
+  # Quick tests and coverage through Turbo
   test-coverage:
-    name: Coverage Check
+    name: Tests & Coverage
     runs-on: ubuntu-latest
 
     services:
@@ -44,6 +48,16 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,25 +70,49 @@ jobs:
           cache: maven
           cache-dependency-path: 'apps/backend/pom.xml'
 
-      - name: Run tests with coverage
-        working-directory: ./apps/backend
-        run: mvn clean test jacoco:report
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
 
-      - name: Check coverage threshold
-        working-directory: ./apps/backend
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Run tests with coverage through Turbo
+      - name: Run tests with coverage
+        run: pnpm test:coverage:ci
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: vetconnect_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+      # Check backend coverage threshold
+      - name: Check backend coverage threshold
         run: |
-          if [ -f target/site/jacoco/jacoco.csv ]; then
-            COVERAGE=$(awk -F"," 'NR>1 { instructions += $4 + $5; covered += $5 } END { if (instructions > 0) print covered/instructions*100; else print 0 }' target/site/jacoco/jacoco.csv)
-            echo "Coverage: $COVERAGE%"
+          if [ -f apps/backend/target/site/jacoco/jacoco.csv ]; then
+            COVERAGE=$(awk -F"," 'NR>1 { instructions += $4 + $5; covered += $5 } END { if (instructions > 0) print covered/instructions*100; else print 0 }' apps/backend/target/site/jacoco/jacoco.csv)
+            echo "Backend Coverage: $COVERAGE%"
             THRESHOLD=60
             if awk -v cov="$COVERAGE" -v thr="$THRESHOLD" 'BEGIN { exit !(cov < thr) }'; then
-              echo "::warning::Coverage ($COVERAGE%) is below threshold (60%)"
+              echo "::warning::Backend coverage ($COVERAGE%) is below threshold (60%)"
             fi
           else
-            echo "::warning::No coverage report found"
+            echo "::warning::No backend coverage report found"
           fi
 
-      - name: Comment coverage on PR
+      # Comment backend coverage on PR
+      - name: Comment backend coverage on PR
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: apps/backend/target/site/jacoco/jacoco.xml
@@ -82,9 +120,28 @@ jobs:
           min-coverage-overall: 60
           min-coverage-changed-files: 60
 
+      # Upload coverage reports
+      - name: Upload backend coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./apps/backend/target/site/jacoco/jacoco.xml
+          flags: backend
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+      - name: Upload frontend coverage
+        uses: codecov/codecov-action@v4
+        with:
+          directory: ./apps/frontend/coverage/
+          flags: frontend
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  # Build verification through Turbo
   build-check:
-    name: Build Check
+    name: Build Verification
     runs-on: ubuntu-latest
+    needs: test-coverage
 
     steps:
       - name: Checkout code
@@ -98,10 +155,59 @@ jobs:
           cache: maven
           cache-dependency-path: 'apps/backend/pom.xml'
 
-      - name: Verify build
-        working-directory: ./apps/backend
-        run: mvn clean verify -DskipTests
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Build everything through Turbo
+      - name: Verify build
+        run: pnpm build
+        env:
+          VITE_API_BASE_URL: http://localhost:8080/api
+          VITE_ENVIRONMENT: ci
+
+  # Lint and type check through Turbo
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Run linters through Turbo
+      - name: Run linters
+        run: pnpm lint
+
+      # Run type checking through Turbo
+      - name: Type check
+        run: pnpm check-types
+
+  # Check for API breaking changes
   api-changes:
     name: API Breaking Changes Check
     runs-on: ubuntu-latest
@@ -119,3 +225,23 @@ jobs:
             echo "::warning::API changes detected. Please review carefully!"
             cat api_changes.diff
           fi
+
+  # Summary job
+  pr-checks-complete:
+    name: PR Checks Complete
+    runs-on: ubuntu-latest
+    needs: [validate, test-coverage, build-check, code-quality, api-changes]
+    if: always()
+
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [[ "${{ needs.validate.result }}" != "success" ]] || \
+             [[ "${{ needs.test-coverage.result }}" != "success" ]] || \
+             [[ "${{ needs.build-check.result }}" != "success" ]] || \
+             [[ "${{ needs.code-quality.result }}" != "success" ]] || \
+             [[ "${{ needs.api-changes.result }}" != "success" ]]; then
+            echo "One or more PR checks failed"
+            exit 1
+          fi
+          echo "All PR checks passed successfully!"

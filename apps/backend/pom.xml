@@ -20,6 +20,8 @@
 
     <properties>
         <java.version>21</java.version>
+        <!-- Default empty argLine, JaCoCo will override if present -->
+        <argLine></argLine>
 
         <!-- Dependency Version Overrides for Security -->
         <hibernate.version>6.6.5.Final</hibernate.version>
@@ -342,6 +344,8 @@
                     <systemPropertyVariables>
                         <spring.profiles.active>test</spring.profiles.active>
                     </systemPropertyVariables>
+                    <!-- JVM args: @{argLine} is JaCoCo agent, rest is for Mockito on Java 21+/25 -->
+                    <argLine>@{argLine} -Dnet.bytebuddy.experimental=true -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${byte-buddy.version}/byte-buddy-agent-${byte-buddy.version}.jar --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.time=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/sun.security.ssl=ALL-UNNAMED -XX:+EnableDynamicAgentLoading</argLine>
                 </configuration>
             </plugin>
 
