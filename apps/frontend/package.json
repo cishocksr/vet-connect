@@ -10,6 +10,7 @@
     "build:production": "tsc -b && vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
+    "check-types": "tsc -b",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:ci": "NODE_OPTIONS='--max-old-space-size=4096' vitest --run",
