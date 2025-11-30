@@ -2,38 +2,26 @@ name: CodeQL Security Scan
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, staging ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, staging ]
   schedule:
-    - cron: '0 6 * * 1'  # Run every Monday at 6 AM UTC
+    - cron: '0 6 * * 1'
 
 jobs:
-  analyze:
-    name: Analyze Code
+  analyze-java:
+    name: Analyze Java
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
       security-events: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'java', 'javascript' ]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-          queries: security-extended,security-and-quality
-
       - name: Set up JDK 21
-        if: matrix.language == 'java'
         uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -41,27 +29,54 @@ jobs:
           cache: maven
           cache-dependency-path: 'apps/backend/pom.xml'
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+          queries: security-extended,security-and-quality
+
       - name: Build with Maven
-        if: matrix.language == 'java'
         working-directory: ./apps/backend
         run: mvn clean package -DskipTests
 
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:java"
+
+  analyze-javascript:
+    name: Analyze JavaScript
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
       - name: Setup Node.js
-        if: matrix.language == 'javascript'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
 
-      - name: Install pnpm
-        if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended,security-and-quality
 
-      - name: Install frontend dependencies
-        if: matrix.language == 'javascript'
-        working-directory: ./apps/frontend
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{matrix.language}}"
+          category: "/language:javascript-typescript"
