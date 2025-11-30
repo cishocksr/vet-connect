@@ -9,6 +9,7 @@ export default defineConfig({
         environment: 'jsdom',
         setupFiles: './src/__test__/setup.ts',
         css: true,
+        pool: 'forks',
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html', 'lcov'],
@@ -27,5 +28,9 @@ export default defineConfig({
         alias: {
             '@': path.resolve(__dirname, './src'),
         },
+    },
+    // Add esbuild config to handle TypeScript in tests properly
+    esbuild: {
+        jsx: 'automatic',
     },
 })
