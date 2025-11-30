@@ -29,4 +29,8 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
+    // Add esbuild config to handle TypeScript in tests properly
+    esbuild: {
+        jsx: 'automatic',
+    },
 })

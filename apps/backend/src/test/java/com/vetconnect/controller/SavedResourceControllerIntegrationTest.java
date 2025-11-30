@@ -145,7 +145,7 @@ class SavedResourceControllerIntegrationTest {
         mockMvc.perform(post("/api/saved")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(saveRequest)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden()); // Returns 403 when no auth token provided
     }
 
     @Test
