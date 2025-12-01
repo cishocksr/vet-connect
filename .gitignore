@@ -1,4 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 
 # Dependencies
 node_modules
@@ -14,6 +14,9 @@ node_modules
 
 # Testing
 coverage
+
+#idea
+.idea
 
 # Turbo
 .turbo
@@ -41,4 +44,4 @@ ARCHITECTURE.md
 LEARNING_FILES.md
 LEARNING_GUIDE.md
 LEARNING_GUIDE_SUMMARY.md
-THEME_FIX.md
+SEO_GUIDE.md
