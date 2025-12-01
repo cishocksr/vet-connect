@@ -45,3 +45,5 @@ build/
 application-*.yml
 !application-test.yml
 !application-prod.yml
+
+/uploads

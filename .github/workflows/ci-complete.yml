@@ -107,10 +107,10 @@ jobs:
           rm -rf apps/frontend/node_modules/.tmp
           find apps/frontend -name "*.tsbuildinfo" -delete
 
-      - name: Run frontend tests
+      - name: Run frontend tests with coverage
         working-directory: ./apps/frontend
-        run: pnpm test:ci
-        continue-on-error: true  # Don't fail build on test failures yet
+        run: pnpm test:coverage:ci
+        continue-on-error: true
 
       - name: Upload frontend coverage
         uses: codecov/codecov-action@v4
