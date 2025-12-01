@@ -7,8 +7,17 @@ interface SelectProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Select = ({ children, onValueChange, ...props }: SelectProps) => {
+  const selectRef = React.useRef<HTMLDivElement>(null);
+  
+  React.useEffect(() => {
+    if (selectRef.current && onValueChange) {
+      // Store the callback on the element for access by SelectItem
+      (selectRef.current as any).onValueChange = onValueChange;
+    }
+  }, [onValueChange]);
+  
   return (
-    <div data-testid="select-mock" {...props} onValueChange={onValueChange}>
+    <div ref={selectRef} data-testid="select-mock" {...props}>
       {children}
     </div>
   );
