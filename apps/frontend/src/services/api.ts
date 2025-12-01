@@ -4,8 +4,8 @@ import axios from 'axios';
 
 // Use runtime config if available, fallback to build-time env var
 const getApiBaseUrl = () => {
-    if (typeof window !== 'undefined' && window.ENV?.API_BASE_URL) {
-        return window.ENV.API_BASE_URL;
+    if (typeof window !== 'undefined' && (window as any).ENV?.API_BASE_URL) {
+        return (window as any).ENV.API_BASE_URL;
     }
     return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 };

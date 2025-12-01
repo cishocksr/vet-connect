@@ -1,9 +1,9 @@
 name: Deploy to Production
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger only for now
+  # push:
+  #   branches: [ main ]  # Enable when AWS production is ready
 
 jobs:
   deploy-production:

@@ -1,10 +1,9 @@
 name: Deploy to Staging
 
 on:
-  push:
-    branches: [ develop ]
-  workflow_dispatch:
-
+  workflow_dispatch:  # Manual trigger only for now
+  # push:
+  #   branches: [ develop ]  # Enable when AWS staging is ready
 jobs:
   deploy-staging:
     name: Deploy to AWS Staging

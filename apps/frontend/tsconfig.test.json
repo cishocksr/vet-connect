@@ -7,7 +7,7 @@
   "include": [
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
-    "src/__test__/**/*"
-  ],
-  "exclude": []
+    "src/__test__/**/*",
+    "src/vite-env.d.ts"
+  ]
 }
