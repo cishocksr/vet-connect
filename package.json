@@ -10,7 +10,9 @@
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
     "test:coverage": "turbo run test:coverage",
-    "test:coverage:ci": "turbo run test:coverage:ci"
+    "test:coverage:ci": "turbo run test:coverage:ci",
+    "lighthouse": "pnpm --filter frontend lighthouse",
+    "lighthouse:accessibility": "pnpm --filter frontend lighthouse:accessibility"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

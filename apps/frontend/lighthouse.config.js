@@ -1,13 +1,15 @@
 import lighthouse from 'lighthouse';
-import chromeLauncher from 'chrome-launcher';
+import * as chromeLauncher from 'chrome-launcher';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
+const baseUrl = process.env.LIGHTHOUSE_URL || 'http://localhost:5173';
+
 const pages = [
-    { name: 'Home', url: 'http://localhost:5173/' },
-    { name: 'Resources', url: 'http://localhost:5173/resources' },
-    { name: 'Login', url: 'http://localhost:5173/login' },
-    { name: 'Register', url: 'http://localhost:5173/register' },
+    { name: 'Home', url: `${baseUrl}/` },
+    { name: 'Resources', url: `${baseUrl}/resources` },
+    { name: 'Login', url: `${baseUrl}/login` },
+    { name: 'Register', url: `${baseUrl}/register` },
 ];
 
 async function runLighthouse() {
