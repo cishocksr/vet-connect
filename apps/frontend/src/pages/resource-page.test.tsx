@@ -27,12 +27,14 @@ describe('ResourcesPage', () => {
 
     const mockResourceSummary: ResourceSummary = {
         id: 'res-123',
-        categoryId: 1,
         categoryName: 'Housing',
+        categoryIconName: 'home',
         name: 'VA Housing Assistance',
+        description: 'Comprehensive housing assistance for veterans',
         shortDescription: 'Comprehensive housing assistance for veterans',
         city: 'Washington',
         state: 'DC',
+        locationDisplay: 'Washington, DC',
         isNational: true,
     };
 

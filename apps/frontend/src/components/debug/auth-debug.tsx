@@ -9,8 +9,7 @@ export function AuthDebug() {
     const token = localStorage.getItem('token');
     const refreshToken = localStorage.getItem('refreshToken');
 
-    if (import.meta.env.PROD) return null; // Don't show in production
-
+    if (import.meta.env.PROD) return null;
     return (
         <div style={{
             position: 'fixed',

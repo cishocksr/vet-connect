@@ -12,7 +12,7 @@ interface UseAuthReturn {
     isAdmin: boolean;
     login: (credentials: LoginRequest) => Promise<void>;
     register: (data: RegisterRequest, options?: { onSuccess?: () => void }) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     setUser: (updatedUser: User) => void;
 }
 
@@ -56,8 +56,9 @@ export function useAuth(): UseAuthReturn {  // ADD RETURN TYPE HERE
         }
     };
 
-    const logout = () => {
-        clearUser();
+    const logout = async () => {
+        await authService.logout(); // Clear server-side session and localStorage
+        clearUser(); // Clear Zustand state
         resetTheme(); // Reset theme to default
         navigate('/login');
     };

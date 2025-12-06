@@ -8,6 +8,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Environment Configuration Validator
  *
@@ -34,12 +39,18 @@ public class EnvironmentConfig {
     @Value("${spring.data.redis.host}")
     private String redisHost;
 
+    @Value("${spring.data.redis.password:}")
+    private String redisPassword;
+
     @NotEmpty(message = "CORS origins must be configured")
-    @Value("${cors.allowed-origins}")
+    @Value("${app.cors.allowed-origins}")  // Fixed: was cors.allowed-origins
     private String corsOrigins;
 
     @Value("${spring.profiles.active}")
     private String activeProfile;
+
+    @Value("${app.upload.dir:uploads/profile-pictures}")  // Fixed: was file.upload-dir
+    private String uploadDirectory;
 
     @PostConstruct
     public void validateEnvironment() {
@@ -56,19 +67,67 @@ public class EnvironmentConfig {
 
         // Validate production settings
         if ("prod".equals(activeProfile)) {
-            if (corsOrigins.contains("localhost")) {
-                throw new IllegalStateException(
-                        "❌ CORS configuration includes localhost in production! " +
-                                "Set CORS_ALLOWED_ORIGINS to your production domain only."
-                );
-            }
-
-            if ("postgres".equals(dbPassword) || dbPassword.length() < 16) {
-                log.warn("⚠️  WARNING: Using weak database password in production!");
-            }
+            validateProductionSettings();
         }
+
+        // Validate upload directory
+        validateUploadDirectory();
 
         log.info("✅ Environment variables validated successfully");
         log.info("📋 Active Profile: {}", activeProfile);
+    }
+
+    /**
+     * Validate production-specific settings
+     */
+    private void validateProductionSettings() {
+        // Check CORS configuration
+        if (corsOrigins.contains("localhost")) {
+            throw new IllegalStateException(
+                    "❌ CORS configuration includes localhost in production! " +
+                            "Set CORS_ALLOWED_ORIGINS to your production domain only."
+            );
+        }
+
+        // Check database password strength
+        if ("postgres".equals(dbPassword) || dbPassword.length() < 16) {
+            log.warn("⚠️  WARNING: Using weak database password in production!");
+        }
+
+        // Check Redis password
+        if (redisPassword == null || redisPassword.isEmpty()) {
+            log.warn("⚠️  WARNING: Redis has no password configured in production!");
+            log.warn("⚠️  Set REDIS_PASSWORD environment variable for production security");
+        }
+
+        log.info("🔐 Production security settings validated");
+    }
+
+    /**
+     * Validate upload directory exists and is writable
+     */
+    private void validateUploadDirectory() {
+        Path uploadPath = Paths.get(uploadDirectory);
+
+        // Create directory if it doesn't exist
+        if (!Files.exists(uploadPath)) {
+            try {
+                Files.createDirectories(uploadPath);
+                log.info("✅ Created upload directory: {}", uploadPath.toAbsolutePath());
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "❌ Cannot create upload directory: " + uploadPath.toAbsolutePath(), e
+                );
+            }
+        }
+
+        // Verify directory is writable
+        if (!Files.isWritable(uploadPath)) {
+            throw new IllegalStateException(
+                    "❌ Upload directory is not writable: " + uploadPath.toAbsolutePath()
+            );
+        }
+
+        log.info("📁 Upload directory validated: {}", uploadPath.toAbsolutePath());
     }
 }

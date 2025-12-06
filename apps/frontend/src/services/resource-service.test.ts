@@ -16,12 +16,14 @@ describe('ResourceService', () => {
 
     const mockResourceSummary: ResourceSummary = {
         id: 'res-123',
-        categoryId: 1,
         categoryName: 'Housing',
+        categoryIconName: 'home',
         name: 'VA Housing Assistance',
+        description: 'Comprehensive housing assistance for veterans',
         shortDescription: 'Comprehensive housing assistance for veterans',
         city: 'Washington',
         state: 'DC',
+        locationDisplay: 'Washington, DC',
         isNational: true,
     };
 
@@ -222,7 +224,7 @@ describe('ResourceService', () => {
                     categoryId: 1,
                 },
             });
-            expect(result.content[0].categoryId).toBe(1);
+expect(result.content[0].categoryName).toBe('Housing');
         });
 
         it('should filter by state only', async () => {
@@ -287,7 +289,7 @@ describe('ResourceService', () => {
             expect(api.get).toHaveBeenCalledWith('/resources/category/1', {
                 params: { page: 0, size: 20 },
             });
-            expect(result.content[0].categoryId).toBe(1);
+expect(result.content[0].categoryName).toBe('Housing');
         });
 
         it('should fetch resources by category with custom pagination', async () => {

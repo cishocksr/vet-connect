@@ -20,6 +20,7 @@ describe('AuthService', () => {
         state: 'VA',
         zipCode: '22201',
         isHomeless: false,
+        role: 'VETERAN',
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
     };
@@ -189,14 +190,17 @@ describe('AuthService', () => {
     });
 
     describe('logout', () => {
-        it('should clear authentication tokens from localStorage', () => {
+        it('should clear authentication tokens from localStorage', async () => {
+            // Mock API call
+            vi.mocked(api.post).mockResolvedValue({ data: {} });
+
             // Set tokens in localStorage
             localStorage.setItem('token', 'mock-token');
             localStorage.setItem('refreshToken', 'mock-refresh-token');
             localStorage.setItem('user', JSON.stringify(mockUser));
 
             // Call logout
-            authService.logout();
+            await authService.logout();
 
             // Verify tokens are removed
             expect(localStorage.getItem('token')).toBeNull();
@@ -204,9 +208,12 @@ describe('AuthService', () => {
             expect(localStorage.getItem('user')).toBeNull();
         });
 
-        it('should handle logout when no tokens exist', () => {
+        it('should handle logout when no tokens exist', async () => {
+            // Mock API call
+            vi.mocked(api.post).mockResolvedValue({ data: {} });
+
             // Should not throw error
-            expect(() => authService.logout()).not.toThrow();
+            await expect(authService.logout()).resolves.not.toThrow();
 
             // Verify localStorage is still clean
             expect(localStorage.getItem('token')).toBeNull();

@@ -1,0 +1,76 @@
+name: Deploy to Staging
+
+on:
+  workflow_dispatch:  # Manual trigger only for now
+  # push:
+  #   branches: [ develop ]  # Enable when AWS staging is ready
+jobs:
+  deploy-staging:
+    name: Deploy to AWS Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_STAGING }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STAGING }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: vetconnect-backend-staging
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f apps/backend/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Build and push frontend image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: vetconnect-frontend-staging
+          IMAGE_TAG: ${{ github.sha }}
+          VITE_API_BASE_URL: https://api-staging.vetconnect.com/api
+          VITE_ENVIRONMENT: staging
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL \
+            --build-arg VITE_ENVIRONMENT=$VITE_ENVIRONMENT \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -f apps/frontend/Dockerfile .
+
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster vetconnect-staging \
+            --service vetconnect-backend-staging \
+            --force-new-deployment
+          
+          aws ecs update-service \
+            --cluster vetconnect-staging \
+            --service vetconnect-frontend-staging \
+            --force-new-deployment
+
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster vetconnect-staging \
+            --services vetconnect-backend-staging vetconnect-frontend-staging
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "✅ Staging deployment successful!"
+          echo "Backend: https://api-staging.vetconnect.com"
+          echo "Frontend: https://staging.vetconnect.com"

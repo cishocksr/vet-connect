@@ -32,6 +32,7 @@ describe('useAuth', () => {
         state: 'VA',
         zipCode: '22201',
         isHomeless: false,
+        role: 'VETERAN',
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T00:00:00Z',
     };
@@ -49,6 +50,8 @@ describe('useAuth', () => {
             user: null,
             isAuthenticated: false,
         });
+        // Mock authService.logout to resolve successfully
+        vi.mocked(authService.logout).mockResolvedValue(undefined);
     });
 
     describe('Initial State', () => {
@@ -167,7 +170,7 @@ describe('useAuth', () => {
     });
 
     describe('logout', () => {
-        it('should logout user, clear state, and navigate to login', () => {
+        it('should logout user, clear state, and navigate to login', async () => {
             // First set up authenticated state using store directly
             const store = useAuthStore.getState();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -180,21 +183,23 @@ describe('useAuth', () => {
             expect(result.current.isAuthenticated).toBe(true);
 
             // Logout
-            result.current.logout();
+            await result.current.logout();
 
             // Verify state is cleared
-            expect(result.current.user).toBeNull();
-            expect(result.current.isAuthenticated).toBe(false);
+            await waitFor(() => {
+                expect(result.current.user).toBeNull();
+                expect(result.current.isAuthenticated).toBe(false);
+            });
             expect(mockNavigate).toHaveBeenCalledWith('/login');
             expect(localStorage.getItem('token')).toBeNull();
             expect(localStorage.getItem('user')).toBeNull();
         });
 
-        it('should handle logout when already logged out', () => {
+        it('should handle logout when already logged out', async () => {
             const { result } = renderHook(() => useAuth());
 
             // Should not throw
-            expect(() => result.current.logout()).not.toThrow();
+            await expect(result.current.logout()).resolves.not.toThrow();
 
             expect(mockNavigate).toHaveBeenCalledWith('/login');
         });
@@ -272,8 +277,10 @@ describe('useAuth', () => {
             });
 
             // Logout
-            result.current.logout();
-            expect(result.current.isAuthenticated).toBe(false);
+            await result.current.logout();
+            await waitFor(() => {
+                expect(result.current.isAuthenticated).toBe(false);
+            });
 
             // Login again
             await result.current.login({

@@ -1,6 +1,38 @@
-import { afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
+
+// Mock localStorage
+const localStorageMock = (() => {
+    let store: Record<string, string> = {}
+
+    return {
+        getItem: (key: string) => store[key] || null,
+        setItem: (key: string, value: string) => {
+            store[key] = value.toString()
+        },
+        removeItem: (key: string) => {
+            delete store[key]
+        },
+        clear: () => {
+            store = {}
+        },
+        get length() {
+            return Object.keys(store).length
+        },
+        key: (index: number) => {
+            const keys = Object.keys(store)
+            return keys[index] || null
+        },
+    }
+})()
+
+globalThis.localStorage = localStorageMock as Storage
+
+// Clear localStorage before each test
+beforeEach(() => {
+    localStorage.clear()
+})
 
 // Cleanup after each test
 afterEach(() => {
@@ -39,3 +71,19 @@ globalThis.ResizeObserver = class ResizeObserver {
     unobserve = vi.fn()
     disconnect = vi.fn()
 } as unknown as typeof ResizeObserver
+
+// Mock scrollIntoView for Radix UI Select
+Element.prototype.scrollIntoView = vi.fn()
+
+// Mock hasPointerCapture for Radix UI Select
+if (typeof Element.prototype.hasPointerCapture === 'undefined') {
+    Element.prototype.hasPointerCapture = vi.fn(() => false)
+}
+
+// Mock setPointerCapture and releasePointerCapture
+if (typeof Element.prototype.setPointerCapture === 'undefined') {
+    Element.prototype.setPointerCapture = vi.fn()
+}
+if (typeof Element.prototype.releasePointerCapture === 'undefined') {
+    Element.prototype.releasePointerCapture = vi.fn()
+}
