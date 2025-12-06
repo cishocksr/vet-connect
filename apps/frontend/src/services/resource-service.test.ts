@@ -122,7 +122,7 @@ describe('ResourceService', () => {
     });
 
     describe('getResourceById', () => {
-        it('should fetch a single resource by id', async () => {
+        it('should fetch a single resources by id', async () => {
             vi.mocked(api.get).mockResolvedValue({
                 data: {
                     success: true,
@@ -138,7 +138,7 @@ describe('ResourceService', () => {
             expect(result.id).toBe('res-123');
         });
 
-        it('should throw error when resource not found', async () => {
+        it('should throw error when resources not found', async () => {
             const error = new Error('Resource not found');
             vi.mocked(api.get).mockRejectedValue(error);
 
@@ -345,7 +345,7 @@ describe('ResourceService', () => {
     });
 
     describe('getAllCategories', () => {
-        it('should fetch all resource categories', async () => {
+        it('should fetch all resources categories', async () => {
             vi.mocked(api.get).mockResolvedValue({
                 data: {
                     success: true,
@@ -363,7 +363,7 @@ describe('ResourceService', () => {
     });
 
     describe('getCategoriesWithCounts', () => {
-        it('should fetch categories with resource counts', async () => {
+        it('should fetch categories with resources counts', async () => {
             const categoryWithCount = {
                 ...mockCategory,
                 resourceCount: 42,

@@ -20,7 +20,7 @@ describe('HomePage', () => {
         expect(heroText).toBeTruthy();
     });
 
-    it('should display resource categories', () => {
+    it('should display resources categories', () => {
         render(<HomePage />);
 
         // Look for category cards or links

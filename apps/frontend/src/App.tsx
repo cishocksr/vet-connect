@@ -18,6 +18,7 @@ import AdminDashboard from "@/pages/admin/admin-dashboard.tsx";
 import {AdminRoute} from "@/components/auth/admin-route.tsx";
 import AdminUsers from "@/pages/admin/admin-users.tsx";
 import AdminUserDetail from "@/pages/admin/admin-user-detail.tsx";
+import {AnimatePresence} from "framer-motion";
 
 const organizationSchema = {
     '@context': 'https://schema.org',
@@ -57,6 +58,7 @@ function App() {
             <StructuredData data={websiteSchema} />
 
             <Navbar />
+            <AnimatePresence mode="wait">
             <main className="flex-1">
                 <Routes>
                     <Route path="/" element={<HomePage />} />
@@ -112,6 +114,7 @@ function App() {
                     />
                 </Routes>
             </main>
+            </AnimatePresence>
             <Footer />
             <Toaster />
         </div>

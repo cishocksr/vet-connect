@@ -1,18 +1,16 @@
-import { useState, } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
 import resourceService from '../services/resource-service';
 import type { ResourceSearchParams } from '../types';
+import { ResourceCard } from '../components/resources/resource-card';
 import {
     Search,
-    MapPin,
-    Globe,
     ChevronLeft,
     ChevronRight,
     Filter
@@ -218,42 +216,7 @@ export default function ResourcesPage() {
                         ))
                     ) : resourcesData && resourcesData.content.length > 0 ? (
                         resourcesData.content.map((resource) => (
-                            <Link key={resource.id} to={`/resources/${resource.id}`}>
-                                <Card className="h-full transition-all hover:shadow-lg hover:border-primary-500 cursor-pointer">
-                                    <CardHeader>
-                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                            <Badge variant="secondary" className="text-xs">
-                                                {resource.categoryName}
-                                            </Badge>
-                                            {resource.isNational ? (
-                                                <Badge className="bg-military-gold text-white text-xs">
-                                                    <Globe className="h-3 w-3 mr-1" />
-                                                    National
-                                                </Badge>
-                                            ) : resource.state && (
-                                                <Badge variant="outline" className="text-xs">
-                                                    <MapPin className="h-3 w-3 mr-1" />
-                                                    {resource.state}
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <CardTitle className="line-clamp-2 text-lg">
-                                            {resource.name}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <CardDescription className="line-clamp-3">
-                                            {resource.shortDescription}
-                                        </CardDescription>
-                                        {resource.city && resource.state && (
-                                            <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">
-                                                <MapPin className="h-3 w-3" />
-                                                {resource.city}, {resource.state}
-                                            </p>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </Link>
+                            <ResourceCard key={resource.id} resource={resource} />
                         ))
                     ) : (
                         // No results

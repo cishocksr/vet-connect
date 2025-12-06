@@ -20,7 +20,7 @@ class SavedResourceService {
     }
 
     /**
-     * Save a resource
+     * Save a resources
      */
     async saveResource(data: SaveResourceRequest): Promise<SavedResource> {
         const response = await api.post<ApiResponse<SavedResource>>('/saved', data);
@@ -28,7 +28,7 @@ class SavedResourceService {
     }
 
     /**
-     * Update notes for saved resource
+     * Update notes for saved resources
      */
     async updateNotes(savedResourceId: string, notes: string): Promise<SavedResource> {
         const response = await api.patch<ApiResponse<SavedResource>>(
@@ -39,14 +39,14 @@ class SavedResourceService {
     }
 
     /**
-     * Remove saved resource
+     * Remove saved resources
      */
     async removeSavedResource(savedResourceId: string): Promise<void> {
         await api.delete(`/saved/${savedResourceId}`);
     }
 
     /**
-     * Check if resource is saved
+     * Check if resources is saved
      */
     async isResourceSaved(resourceId: string): Promise<boolean> {
         const response = await api.get<ApiResponse<boolean>>(

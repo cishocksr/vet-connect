@@ -25,5 +25,5 @@
     <priority>0.5</priority>
   </url>
   <!-- Add more static routes as needed -->
-  <!-- Note: Consider implementing dynamic sitemap generation for resource pages -->
+  <!-- Note: Consider implementing dynamic sitemap generation for resources pages -->
 </urlset>

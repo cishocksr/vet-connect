@@ -6,7 +6,7 @@ import savedResourceService from '../services/saved-resource-service';
 import type { User } from '../types';
 
 // Mock services
-vi.mock('../services/saved-resource-service');
+vi.mock('../services/saved-resources-service');
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
     return {
@@ -39,7 +39,7 @@ describe('DashboardPage', () => {
             user: mockUser,
             isAuthenticated: true,
         });
-        // Mock saved resource service to return empty array by default
+        // Mock saved resources service to return empty array by default
         vi.mocked(savedResourceService.getSavedResources).mockResolvedValue([]);
     });
 
@@ -97,7 +97,7 @@ describe('DashboardPage', () => {
     });
 
     describe('Resource Cards', () => {
-        it('should display resource information in cards', async () => {
+        it('should display resources information in cards', async () => {
             render(<DashboardPage />);
 
             await waitFor(() => {

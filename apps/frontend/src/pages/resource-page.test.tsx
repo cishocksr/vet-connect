@@ -5,7 +5,7 @@ import resourceService from '../services/resource-service';
 import type { ResourceSummary, ResourceCategory, PageResponse } from '../types';
 
 // Mock services
-vi.mock('../services/resource-service');
+vi.mock('../services/resources-service');
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -154,7 +154,7 @@ describe('ResourcesPage', () => {
             expect(document.body).toBeInTheDocument();
         });
 
-        it('should display resource cards after loading', async () => {
+        it('should display resources cards after loading', async () => {
             render(<ResourcesPage />);
 
             await waitFor(() => {
@@ -162,7 +162,7 @@ describe('ResourcesPage', () => {
             });
         });
 
-        it('should display resource information in cards', async () => {
+        it('should display resources information in cards', async () => {
             render(<ResourcesPage />);
 
             await waitFor(() => {
@@ -171,7 +171,7 @@ describe('ResourcesPage', () => {
             });
         });
 
-        it('should show category badge on resource cards', async () => {
+        it('should show category badge on resources cards', async () => {
             render(<ResourcesPage />);
 
             await waitFor(() => {
@@ -282,7 +282,7 @@ describe('ResourcesPage', () => {
     });
 
     describe('Resource Navigation', () => {
-        it('should navigate to resource detail page when clicking resource card', async () => {
+        it('should navigate to resources detail page when clicking resources card', async () => {
             render(<ResourcesPage />);
 
             await waitFor(() => {

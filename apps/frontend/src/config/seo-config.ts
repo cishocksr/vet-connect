@@ -2,7 +2,7 @@
 export const SEO_CONFIG = {
   home: {
     title: 'Home',
-    description: 'VetConnect - Your comprehensive resource hub for housing, healthcare, education, and support services. Built for veterans, by veterans.',
+    description: 'VetConnect - Your comprehensive resources hub for housing, healthcare, education, and support services. Built for veterans, by veterans.',
     keywords: 'veterans resources, veteran support, VA benefits, veteran assistance',
   },
   resources: {

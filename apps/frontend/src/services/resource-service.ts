@@ -12,7 +12,7 @@ import type {
 /**
  * Resource Service
  *
- * Handles all resource-related API calls
+ * Handles all resources-related API calls
  */
 class ResourceService {
     /**
@@ -38,7 +38,7 @@ class ResourceService {
     }
 
     /**
-     * Get single resource by ID
+     * Get single resources by ID
      */
     async getResourceById(id: string): Promise<Resource> {
         const response = await api.get<ApiResponse<Resource>>(`/resources/${id}`);
@@ -92,7 +92,7 @@ class ResourceService {
     }
 
     /**
-     * Get categories with resource counts
+     * Get categories with resources counts
      */
     async getCategoriesWithCounts(): Promise<ResourceCategoryWithCount[]> {
         const response = await api.get<ApiResponse<ResourceCategoryWithCount[]>>(

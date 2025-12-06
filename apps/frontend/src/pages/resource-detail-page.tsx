@@ -37,21 +37,21 @@ export default function ResourceDetailPage() {
     const [notes, setNotes] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    // Fetch resource details
+    // Fetch resources details
     const { data: resource, isLoading } = useQuery({
         queryKey: ['resource', id],
         queryFn: () => resourceService.getResourceById(id!),
         enabled: !!id,
     });
 
-    // Check if resource is saved
+    // Check if resources is saved
     const { data: isSaved } = useQuery({
         queryKey: ['saved', 'check', id],
         queryFn: () => savedResourceService.isResourceSaved(id!),
         enabled: !!id && isAuthenticated,
     });
 
-    // Save resource mutation
+    // Save resources mutation
     const saveMutation = useMutation({
         mutationFn: (data: { resourceId: string; notes?: string }) =>
             savedResourceService.saveResource(data),
@@ -69,7 +69,7 @@ export default function ResourceDetailPage() {
             console.error('Error status:', error?.response?.status);
             console.error('Error data:', error?.response?.data);
             
-            let errorMessage = 'Failed to save resource. Please try again.';
+            let errorMessage = 'Failed to save resources. Please try again.';
             
             if (error?.response?.status === 403) {
                 errorMessage = 'Access denied. Please log out and log back in.';
