@@ -7,9 +7,8 @@
 **Connecting U.S. Veterans with Essential Resources**
 
 [![Build Status](https://github.com/cishocksr/vetconnect/workflows/CI/badge.svg)](https://github.com/cishocksr/vetconnect/actions)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/cishocksr/vetconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/cishockst/vetconnect)
-
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/cishocksr/vetconnect/blob/main/LICENSE)
+[![codecov](https://codecov.io/gh/cishocksr/vetconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/cishocksr/vetconnect)
 [Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](#contributing)
 
 </div>

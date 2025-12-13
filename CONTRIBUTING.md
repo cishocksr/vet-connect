@@ -66,8 +66,8 @@ git checkout -b fix/bug-description
 
 ####
 
-3. **Commit Your Changes**
-   Follow conventional commit format:
+#### 3. **Commit Your Changes**
+Follow conventional commit format:
 ```bash
 git commit -m "feat: add resource filtering by zip code"
 git commit -m "fix: correct JWT token expiration validation"
